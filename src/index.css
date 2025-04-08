@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -197,5 +196,13 @@
 
   .accessibility-btn {
     @apply p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-md transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground;
+  }
+
+  .sidebar-item.active {
+    @apply bg-sidebar-accent text-sidebar-accent-foreground font-medium;
   }
 }

@@ -1,10 +1,17 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import PlaceholderPage from "./components/PlaceholderPage";
+import { 
+  Users, Calendar, Bus, Megaphone, Shield, 
+  AlertTriangle, FileText, Settings 
+} from "lucide-react";
 
 const queryClient = new QueryClient();
 
@@ -16,7 +23,72 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route 
+            path="/visitor-management" 
+            element={<PlaceholderPage 
+              title="Visitor Management System" 
+              icon={<Users className="h-16 w-16" />} 
+              description="Streamline campus visitor check-in, verify guest identities, and maintain secure access logs."
+            />} 
+          />
+          <Route 
+            path="/worker-attendance" 
+            element={<PlaceholderPage 
+              title="Worker Attendance" 
+              icon={<Calendar className="h-16 w-16" />} 
+              description="Monitor staff attendance through biometric verification and access comprehensive attendance reports."
+            />} 
+          />
+          <Route 
+            path="/bus-tracker" 
+            element={<PlaceholderPage 
+              title="Bus Entry/Exit Tracker" 
+              icon={<Bus className="h-16 w-16" />} 
+              description="Track campus transportation in real-time with GPS and automated license plate recognition."
+            />} 
+          />
+          <Route 
+            path="/communication-hub" 
+            element={<PlaceholderPage 
+              title="Security Communication Hub" 
+              icon={<Megaphone className="h-16 w-16" />} 
+              description="Enable multilingual communication between administrators and security personnel across campus."
+            />} 
+          />
+          <Route 
+            path="/safety-tips" 
+            element={<PlaceholderPage 
+              title="Campus Safety Tips" 
+              icon={<Shield className="h-16 w-16" />} 
+              description="Access resources for personal safety, security awareness, and campus preparedness."
+            />} 
+          />
+          <Route 
+            path="/emergency-alerts" 
+            element={<PlaceholderPage 
+              title="Emergency Alerts & Notifications" 
+              icon={<AlertTriangle className="h-16 w-16" />} 
+              description="Receive critical campus alerts and emergency notifications in real-time."
+            />} 
+          />
+          <Route 
+            path="/incident-reporting" 
+            element={<PlaceholderPage 
+              title="Incident Reporting System" 
+              icon={<FileText className="h-16 w-16" />} 
+              description="Report campus incidents securely, with options for anonymous submissions and status tracking."
+            />} 
+          />
+          <Route 
+            path="/settings" 
+            element={<PlaceholderPage 
+              title="Settings / Accessibility Options" 
+              icon={<Settings className="h-16 w-16" />} 
+              description="Customize your experience with theme preferences, language options, and accessibility features."
+            />} 
+          />
+          {/* Catch-all route for 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
