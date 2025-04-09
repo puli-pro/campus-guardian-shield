@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import AdminDashboard from "./pages/AdminDashboard";
+import VisitorManagement from "./pages/VisitorManagement";
 import NotFound from "./pages/NotFound";
 import PlaceholderPage from "./components/PlaceholderPage";
 import { 
@@ -24,14 +25,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route 
-            path="/visitor-management" 
-            element={<PlaceholderPage 
-              title="Visitor Management System" 
-              icon={<Users className="h-16 w-16" />} 
-              description="Streamline campus visitor check-in, verify guest identities, and maintain secure access logs."
-            />} 
-          />
+          <Route path="/visitor-management" element={<VisitorManagement />} />
           <Route 
             path="/worker-attendance" 
             element={<PlaceholderPage 
