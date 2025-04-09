@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import AdminDashboard from "./pages/AdminDashboard";
 import VisitorManagement from "./pages/VisitorManagement";
+import WorkerAttendance from "./pages/WorkerAttendance";
 import NotFound from "./pages/NotFound";
 import PlaceholderPage from "./components/PlaceholderPage";
 import { 
@@ -26,14 +27,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/visitor-management" element={<VisitorManagement />} />
-          <Route 
-            path="/worker-attendance" 
-            element={<PlaceholderPage 
-              title="Worker Attendance" 
-              icon={<Calendar className="h-16 w-16" />} 
-              description="Monitor staff attendance through biometric verification and access comprehensive attendance reports."
-            />} 
-          />
+          <Route path="/worker-attendance" element={<WorkerAttendance />} />
           <Route 
             path="/bus-tracker" 
             element={<PlaceholderPage 
