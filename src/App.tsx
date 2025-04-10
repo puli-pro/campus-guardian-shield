@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import AdminDashboard from "./pages/AdminDashboard";
 import VisitorManagement from "./pages/VisitorManagement";
 import WorkerAttendance from "./pages/WorkerAttendance";
+import BusTracker from "./pages/BusTracker";
 import NotFound from "./pages/NotFound";
 import PlaceholderPage from "./components/PlaceholderPage";
 import { 
@@ -28,14 +29,7 @@ const App = () => (
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/visitor-management" element={<VisitorManagement />} />
           <Route path="/worker-attendance" element={<WorkerAttendance />} />
-          <Route 
-            path="/bus-tracker" 
-            element={<PlaceholderPage 
-              title="Bus Entry/Exit Tracker" 
-              icon={<Bus className="h-16 w-16" />} 
-              description="Track campus transportation in real-time with GPS and automated license plate recognition."
-            />} 
-          />
+          <Route path="/bus-tracker" element={<BusTracker />} />
           <Route 
             path="/communication-hub" 
             element={<PlaceholderPage 
