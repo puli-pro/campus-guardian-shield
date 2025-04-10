@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
-import { Download, FileSpreadsheet, FilePdf, CalendarIcon } from "lucide-react";
+import { Download, FileSpreadsheet, FileText, CalendarIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -209,7 +209,7 @@ export default function AttendanceReports() {
           {exportFormat === "excel" ? (
             <FileSpreadsheet className="h-4 w-4" />
           ) : (
-            <FilePdf className="h-4 w-4" />
+            <FileText className="h-4 w-4" />
           )}
         </Button>
       </div>

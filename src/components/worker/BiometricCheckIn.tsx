@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Fingerprint, CheckCircle, Clock, XCircle, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -88,7 +87,7 @@ export default function BiometricCheckIn() {
         toast({
           title: status === "present" ? "Check-in Successful" : "Late Check-in",
           description: `${selectedWorker.name} (${selectedWorker.id}) checked in at ${now.toLocaleTimeString()}`,
-          variant: status === "present" ? "default" : "warning"
+          variant: status === "present" ? "default" : "destructive"
         });
       } else if (searchId) {
         toast({
