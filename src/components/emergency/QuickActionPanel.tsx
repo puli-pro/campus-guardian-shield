@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertOctagon, Phone, MapPin, UserCheck, SOS, HelpCircle } from "lucide-react";
+import { AlertOctagon, Phone, MapPin, UserCheck, AlertTriangle, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const QuickActionPanel = () => {
@@ -47,7 +47,7 @@ const QuickActionPanel = () => {
             className="bg-red-600 hover:bg-red-700 text-white h-14 gap-3" 
             onClick={triggerSOS}
           >
-            <SOS className="h-5 w-5" />
+            <AlertTriangle className="h-5 w-5" />
             <span className="font-bold">SOS EMERGENCY</span>
           </Button>
           
