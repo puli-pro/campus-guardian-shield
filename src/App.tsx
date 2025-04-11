@@ -11,6 +11,8 @@ import WorkerAttendance from "./pages/WorkerAttendance";
 import BusTracker from "./pages/BusTracker";
 import CommunicationHub from "./pages/CommunicationHub";
 import SafetyTips from "./pages/SafetyTips";
+import EmergencyAlerts from "./pages/EmergencyAlerts";
+import IncidentReporting from "./pages/IncidentReporting";
 import NotFound from "./pages/NotFound";
 import PlaceholderPage from "./components/PlaceholderPage";
 import { 
@@ -34,22 +36,8 @@ const App = () => (
           <Route path="/bus-tracker" element={<BusTracker />} />
           <Route path="/communication-hub" element={<CommunicationHub />} />
           <Route path="/safety-tips" element={<SafetyTips />} />
-          <Route 
-            path="/emergency-alerts" 
-            element={<PlaceholderPage 
-              title="Emergency Alerts & Notifications" 
-              icon={<AlertTriangle className="h-16 w-16" />} 
-              description="Receive critical campus alerts and emergency notifications in real-time."
-            />} 
-          />
-          <Route 
-            path="/incident-reporting" 
-            element={<PlaceholderPage 
-              title="Incident Reporting System" 
-              icon={<FileText className="h-16 w-16" />} 
-              description="Report campus incidents securely, with options for anonymous submissions and status tracking."
-            />} 
-          />
+          <Route path="/emergency-alerts" element={<EmergencyAlerts />} />
+          <Route path="/incident-reporting" element={<IncidentReporting />} />
           <Route 
             path="/settings" 
             element={<PlaceholderPage 

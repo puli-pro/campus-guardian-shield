@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -113,7 +112,6 @@ const SafetyCategories = () => {
     }
   ];
   
-  // New college-specific rules
   const collegeRules: SafetyTip[] = [
     {
       id: "r1",
@@ -138,13 +136,11 @@ const SafetyCategories = () => {
     }
   ];
   
-  // Daily safety tip
   const dailyTip = {
     title: "Today's Safety Tip",
     content: "Always lock your dormitory room, even when stepping out for just a few minutes. Most thefts occur during brief absences."
   };
   
-  // Did You Know fact
   const safetyFact = {
     title: "Did You Know?",
     content: "Campus security can provide safety escorts 24/7 for students walking to parking lots or dormitories after dark. Call ext. 5555 to request this free service."
@@ -226,7 +222,6 @@ const SafetyCategories = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Daily Tip and Did You Know section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
             <AlertTitle className="flex items-center text-blue-700 dark:text-blue-400">
@@ -311,7 +306,7 @@ const SafetyCategories = () => {
           </TabsContent>
           
           <TabsContent value="college">
-            <Alert className="mb-4" className="bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-900">
+            <Alert className="bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-900">
               <AlertTitle className="flex items-center text-purple-700 dark:text-purple-400">
                 <School className="h-4 w-4 mr-2" /> College-Specific Rules
               </AlertTitle>
