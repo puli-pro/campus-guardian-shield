@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Smartphone, Users, AlertTriangle, Play, Volume2, FileText, ArrowUpRight } from "lucide-react";
+import { Shield, Smartphone, Users, AlertTriangle, Play, Volume2, FileText, ArrowUpRight, School, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   Accordion,
@@ -113,6 +113,43 @@ const SafetyCategories = () => {
     }
   ];
   
+  // New college-specific rules
+  const collegeRules: SafetyTip[] = [
+    {
+      id: "r1",
+      title: "Campus Curfew Hours",
+      description: "Information about campus and dormitory curfew rules.",
+      type: "text",
+      content: "• Main campus gates close at 10:00 PM\n• Dormitory access restricted after 11:00 PM\n• Late entry requires security authorization\n• Weekend curfew extensions available with prior approval\n• Emergency exits remain accessible 24/7\n• Violation of curfew may result in disciplinary action"
+    },
+    {
+      id: "r2",
+      title: "Laboratory Safety Protocol",
+      description: "Required safety procedures for all science and engineering labs.",
+      type: "pdf",
+      source: "/lab-safety-protocol.pdf"
+    },
+    {
+      id: "r3",
+      title: "Event Registration Guidelines",
+      description: "Rules for organizing and conducting events on campus.",
+      type: "text",
+      content: "• All events require minimum 7-day advance registration\n• Events expecting 50+ attendees need security clearance\n• Outdoor events must end by 9:00 PM on weekdays\n• External speakers must be approved by administration\n• Fire safety protocols must be reviewed before decorating\n• Cleanup is the responsibility of the organizing group"
+    }
+  ];
+  
+  // Daily safety tip
+  const dailyTip = {
+    title: "Today's Safety Tip",
+    content: "Always lock your dormitory room, even when stepping out for just a few minutes. Most thefts occur during brief absences."
+  };
+  
+  // Did You Know fact
+  const safetyFact = {
+    title: "Did You Know?",
+    content: "Campus security can provide safety escorts 24/7 for students walking to parking lots or dormitories after dark. Call ext. 5555 to request this free service."
+  };
+  
   const renderTipContent = (tip: SafetyTip) => {
     switch (tip.type) {
       case "text":
@@ -173,6 +210,8 @@ const SafetyCategories = () => {
         return visitorTips;
       case "emergency":
         return emergencyTips;
+      case "college":
+        return collegeRules;
       default:
         return campusTips;
     }
@@ -187,8 +226,29 @@ const SafetyCategories = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Daily Tip and Did You Know section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+            <AlertTitle className="flex items-center text-blue-700 dark:text-blue-400">
+              <Info className="h-4 w-4 mr-2" /> {dailyTip.title}
+            </AlertTitle>
+            <AlertDescription className="text-blue-700 dark:text-blue-400">
+              {dailyTip.content}
+            </AlertDescription>
+          </Alert>
+          
+          <Alert className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
+            <AlertTitle className="flex items-center text-amber-700 dark:text-amber-400">
+              <Info className="h-4 w-4 mr-2" /> {safetyFact.title}
+            </AlertTitle>
+            <AlertDescription className="text-amber-700 dark:text-amber-400">
+              {safetyFact.content}
+            </AlertDescription>
+          </Alert>
+        </div>
+        
         <Tabs defaultValue="campus" onValueChange={setActiveCategory}>
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-4">
+          <TabsList className="grid grid-cols-2 md:grid-cols-5 mb-4">
             <TabsTrigger value="campus">
               <Shield className="h-4 w-4 mr-2" /> Campus
             </TabsTrigger>
@@ -200,6 +260,9 @@ const SafetyCategories = () => {
             </TabsTrigger>
             <TabsTrigger value="emergency">
               <AlertTriangle className="h-4 w-4 mr-2" /> Emergency
+            </TabsTrigger>
+            <TabsTrigger value="college">
+              <School className="h-4 w-4 mr-2" /> College Rules
             </TabsTrigger>
           </TabsList>
           
@@ -243,6 +306,17 @@ const SafetyCategories = () => {
               </AlertTitle>
               <AlertDescription>
                 Critical information for responding to various emergency situations on campus.
+              </AlertDescription>
+            </Alert>
+          </TabsContent>
+          
+          <TabsContent value="college">
+            <Alert className="mb-4" className="bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-900">
+              <AlertTitle className="flex items-center text-purple-700 dark:text-purple-400">
+                <School className="h-4 w-4 mr-2" /> College-Specific Rules
+              </AlertTitle>
+              <AlertDescription className="text-purple-700 dark:text-purple-400">
+                Important rules and guidelines specific to our college campus.
               </AlertDescription>
             </Alert>
           </TabsContent>
