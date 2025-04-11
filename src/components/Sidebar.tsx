@@ -28,7 +28,7 @@ type SidebarLink = {
 };
 
 const sidebarLinks: SidebarLink[] = [
-  { icon: Home, label: "Home", path: "/" },
+  { icon: Home, label: "Home", path: "/home" },
   { icon: BarChart, label: "Admin Dashboard", path: "/admin-dashboard" },
   { icon: Users, label: "Visitor Management", path: "/visitor-management" },
   { icon: Calendar, label: "Worker Attendance", path: "/worker-attendance" },

@@ -229,7 +229,7 @@ const AlertBroadcast = () => {
                     <SelectValue placeholder="Set expiry time" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No Expiry</SelectItem>
+                    <SelectItem value="0">No Expiry</SelectItem>
                     <SelectItem value="1">1 Hour</SelectItem>
                     <SelectItem value="2">2 Hours</SelectItem>
                     <SelectItem value="4">4 Hours</SelectItem>

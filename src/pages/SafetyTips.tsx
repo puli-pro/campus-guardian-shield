@@ -5,7 +5,6 @@ import { Helmet } from "react-helmet";
 import SafetyHeader from "@/components/safety/SafetyHeader";
 import SafetyCategories from "@/components/safety/SafetyCategories";
 import EmergencyContacts from "@/components/safety/EmergencyContacts";
-import SafetyQuiz from "@/components/safety/SafetyQuiz";
 import SubmitTipForm from "@/components/safety/SubmitTipForm";
 
 const SafetyTips = () => {
@@ -25,7 +24,6 @@ const SafetyTips = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <SafetyCategories />
-            <SafetyQuiz />
           </div>
           <div className="space-y-6">
             <EmergencyContacts />
