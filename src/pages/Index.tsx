@@ -15,7 +15,7 @@ const Index = () => {
     // Auto-redirect to the Home dashboard after landing page loads
     const timer = setTimeout(() => {
       navigate('/home');
-    }, 100);
+    }, 300);
     
     return () => clearTimeout(timer);
   }, [navigate]);

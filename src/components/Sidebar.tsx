@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
   Home,
@@ -44,6 +44,7 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { toast } = useToast();
+  const location = useLocation();
 
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
@@ -53,15 +54,12 @@ export default function Sidebar() {
     setMobileOpen(!mobileOpen);
   };
 
-  const handleNavigation = (link: SidebarLink) => {
-    if (link.path === "/" || link.path === "#") return;
-    
-    // This is temporary until we implement the actual pages
-    toast({
-      title: `${link.label} page`,
-      description: `Navigating to ${link.label}`,
-    });
-  };
+  // Close mobile sidebar when navigating to a new page
+  useEffect(() => {
+    if (mobileOpen) {
+      setMobileOpen(false);
+    }
+  }, [location.pathname]);
 
   return (
     <>
@@ -118,28 +116,31 @@ export default function Sidebar() {
           {/* Sidebar Links */}
           <nav className="flex-1 overflow-y-auto py-4">
             <ul className="space-y-1 px-2">
-              {sidebarLinks.map((link) => (
-                <li key={link.path}>
-                  <NavLink
-                    to={link.path}
-                    className={({ isActive }) => cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
-                      "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                      isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground",
-                      collapsed && "justify-center px-0"
-                    )}
-                    onClick={() => handleNavigation(link)}
-                  >
-                    <link.icon className={cn("h-5 w-5 shrink-0")} />
-                    {!collapsed && <span>{link.label}</span>}
-                    {!collapsed && link.badge && (
-                      <span className="ml-auto inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full text-xs font-medium bg-primary text-primary-foreground">
-                        {link.badge}
-                      </span>
-                    )}
-                  </NavLink>
-                </li>
-              ))}
+              {sidebarLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                
+                return (
+                  <li key={link.path}>
+                    <NavLink
+                      to={link.path}
+                      className={({ isActive }) => cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                        isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground",
+                        collapsed && "justify-center px-0"
+                      )}
+                    >
+                      <link.icon className={cn("h-5 w-5 shrink-0")} />
+                      {!collapsed && <span>{link.label}</span>}
+                      {!collapsed && link.badge && (
+                        <span className="ml-auto inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full text-xs font-medium bg-primary text-primary-foreground">
+                          {link.badge}
+                        </span>
+                      )}
+                    </NavLink>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
