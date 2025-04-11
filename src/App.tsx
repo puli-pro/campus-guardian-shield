@@ -9,6 +9,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import VisitorManagement from "./pages/VisitorManagement";
 import WorkerAttendance from "./pages/WorkerAttendance";
 import BusTracker from "./pages/BusTracker";
+import CommunicationHub from "./pages/CommunicationHub";
+import SafetyTips from "./pages/SafetyTips";
 import NotFound from "./pages/NotFound";
 import PlaceholderPage from "./components/PlaceholderPage";
 import { 
@@ -30,22 +32,8 @@ const App = () => (
           <Route path="/visitor-management" element={<VisitorManagement />} />
           <Route path="/worker-attendance" element={<WorkerAttendance />} />
           <Route path="/bus-tracker" element={<BusTracker />} />
-          <Route 
-            path="/communication-hub" 
-            element={<PlaceholderPage 
-              title="Security Communication Hub" 
-              icon={<Megaphone className="h-16 w-16" />} 
-              description="Enable multilingual communication between administrators and security personnel across campus."
-            />} 
-          />
-          <Route 
-            path="/safety-tips" 
-            element={<PlaceholderPage 
-              title="Campus Safety Tips" 
-              icon={<Shield className="h-16 w-16" />} 
-              description="Access resources for personal safety, security awareness, and campus preparedness."
-            />} 
-          />
+          <Route path="/communication-hub" element={<CommunicationHub />} />
+          <Route path="/safety-tips" element={<SafetyTips />} />
           <Route 
             path="/emergency-alerts" 
             element={<PlaceholderPage 
