@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Smartphone, Users, AlertTriangle, Play, Volume2, FilePdf, ArrowUpRight } from "lucide-react";
+import { Shield, Smartphone, Users, AlertTriangle, Play, Volume2, FileText, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   Accordion,
@@ -148,7 +148,7 @@ const SafetyCategories = () => {
       case "pdf":
         return (
           <div className="flex items-center gap-2">
-            <FilePdf className="h-8 w-8 text-red-500" />
+            <FileText className="h-8 w-8 text-red-500" />
             <div className="flex-1">
               <p className="text-sm font-medium">{tip.title}</p>
               <p className="text-xs text-muted-foreground">{tip.description}</p>
