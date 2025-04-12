@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { 
+import {
   Table,
   TableBody,
   TableCaption,
@@ -14,6 +14,8 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import axios from "axios";
+import { API_BASE_URL } from "../Constants";
 
 // Mock data for workers
 const workers = [
@@ -42,34 +44,35 @@ export default function BiometricCheckIn() {
   const [currentWorker, setCurrentWorker] = useState<typeof workers[0] | null>(null);
   const [searchId, setSearchId] = useState("");
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
+  const [workersData, setWorkesData] = useState([])
   const { toast } = useToast();
 
   // Function to simulate fingerprint scan
   const handleScan = () => {
     setIsScanning(true);
-    
+
     // Simulate scanning delay
     setTimeout(() => {
       // Randomly select a worker or use the searched one
       let selectedWorker;
-      
+
       if (searchId) {
         selectedWorker = workers.find(w => w.id.toLowerCase() === searchId.toLowerCase());
       } else {
         selectedWorker = workers[Math.floor(Math.random() * workers.length)];
       }
-      
+
       setCurrentWorker(selectedWorker || null);
       setIsScanning(false);
-      
+
       if (selectedWorker) {
         // Determine status based on current time
         const now = new Date();
         const hour = now.getHours();
-        
+
         let status: AttendanceStatus = "present";
         if (hour >= 9 && hour < 10) status = "late";
-        
+
         // Create new attendance record
         const newRecord: AttendanceRecord = {
           id: `ATT-${Date.now()}`,
@@ -79,10 +82,10 @@ export default function BiometricCheckIn() {
           timeIn: now,
           status: status
         };
-        
+
         // Add to records
         setAttendanceRecords(prev => [newRecord, ...prev].slice(0, 10));
-        
+
         // Show toast notification
         toast({
           title: status === "present" ? "Check-in Successful" : "Late Check-in",
@@ -96,25 +99,38 @@ export default function BiometricCheckIn() {
           variant: "destructive"
         });
       }
-      
+
       // Clear search field
       setSearchId("");
     }, 2000);
   };
-  
+
   // Status badge renderer
-  const renderStatusBadge = (status: AttendanceStatus) => {
+  const renderStatusBadge = (status) => {
     switch (status) {
-      case "present":
+      // case "present":
+      case "PR":
         return <Badge className="bg-green-500">Present</Badge>;
       case "late":
         return <Badge variant="secondary" className="bg-yellow-500 text-black">Late</Badge>;
-      case "absent":
+      case "AB":
         return <Badge variant="destructive">Absent</Badge>;
       default:
         return null;
     }
   };
+
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/attendance/`);
+        setWorkesData(response.data)
+      } catch (error) {
+        console.error('Error fetching faculty:', error.response?.data || error.message);
+      }
+    })();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -124,11 +140,11 @@ export default function BiometricCheckIn() {
           <div className="text-center">
             <h3 className="text-xl font-semibold mb-2">Fingerprint Scanner</h3>
             <p className="text-sm text-muted-foreground mb-4">Place finger on scanner to check in</p>
-            
+
             <div className="mb-6 relative">
               <div className={`h-48 w-48 rounded-full border-4 flex items-center justify-center mx-auto ${isScanning ? 'border-blue-500 animate-pulse' : 'border-gray-300'}`}>
-                <Fingerprint 
-                  className={`h-24 w-24 ${isScanning ? 'text-blue-500 animate-pulse' : 'text-gray-400'}`} 
+                <Fingerprint
+                  className={`h-24 w-24 ${isScanning ? 'text-blue-500 animate-pulse' : 'text-gray-400'}`}
                 />
               </div>
               {isScanning && (
@@ -139,24 +155,24 @@ export default function BiometricCheckIn() {
             </div>
 
             <div className="flex gap-4 justify-center">
-              <Button 
-                onClick={handleScan} 
+              <Button
+                onClick={handleScan}
                 disabled={isScanning}
                 className="gap-2"
               >
                 {isScanning ? <RefreshCcw className="h-4 w-4 animate-spin" /> : <Fingerprint className="h-4 w-4" />}
                 {isScanning ? "Scanning..." : "Simulate Scan"}
               </Button>
-              
+
               <div className="flex gap-2">
-                <Input 
+                <Input
                   value={searchId}
                   onChange={(e) => setSearchId(e.target.value)}
                   placeholder="Enter worker ID"
                   className="max-w-[160px]"
                   disabled={isScanning}
                 />
-                <Button 
+                <Button
                   variant="outline"
                   onClick={handleScan}
                   disabled={isScanning || !searchId}
@@ -167,11 +183,11 @@ export default function BiometricCheckIn() {
             </div>
           </div>
         </Card>
-        
+
         {/* Current Check-in Result */}
         <Card className="p-6">
           <h3 className="text-xl font-semibold mb-4">Check-in Result</h3>
-          
+
           {currentWorker ? (
             <div className="space-y-4">
               <div className="flex items-center justify-center mb-6">
@@ -179,7 +195,7 @@ export default function BiometricCheckIn() {
                   {currentWorker.name.charAt(0)}
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 <div className="flex justify-between border-b pb-2">
                   <span className="text-muted-foreground">Name:</span>
@@ -214,11 +230,11 @@ export default function BiometricCheckIn() {
           )}
         </Card>
       </div>
-      
+
       {/* Recent Check-ins */}
       <div>
         <h3 className="text-xl font-semibold mb-4">Recent Check-ins</h3>
-        
+
         <Table>
           <TableCaption>Live attendance feed showing most recent check-ins</TableCaption>
           <TableHeader>
@@ -231,13 +247,30 @@ export default function BiometricCheckIn() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {attendanceRecords.length > 0 ? (
+            {/* {attendanceRecords.length > 0 ? (
               attendanceRecords.map((record) => (
                 <TableRow key={record.id}>
                   <TableCell className="font-medium">{record.workerId}</TableCell>
                   <TableCell>{record.workerName}</TableCell>
                   <TableCell>{record.department}</TableCell>
                   <TableCell>{record.timeIn.toLocaleTimeString()}</TableCell>
+                  <TableCell>{renderStatusBadge(record.status)}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                  No check-in records to display
+                </TableCell>
+              </TableRow>
+            )} */}
+            {workersData.length > 0 ? (
+              workersData.map((record) => (
+                <TableRow key={record?.id}>
+                  <TableCell className="font-medium">{record?.id}</TableCell>
+                  <TableCell>{record?.lecturer?.display_name}</TableCell>
+                  <TableCell>{record?.lecturer?.department_name}</TableCell>
+                  <TableCell>{new Date(record.recorded_at).toLocaleTimeString()}</TableCell>
                   <TableCell>{renderStatusBadge(record.status)}</TableCell>
                 </TableRow>
               ))
