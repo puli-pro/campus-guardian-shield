@@ -3,376 +3,262 @@ import React from "react";
 import Layout from "@/components/Layout";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  AlertTriangle, 
-  Users, 
-  Calendar, 
-  Bus, 
-  Shield, 
-  FileText, 
-  BarChart,
-  ArrowRight,
-  Bell,
-  Megaphone,
-  Settings as SettingsIcon,
-  Clock
-} from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle, UserCheck, Bell, Phone, Mail, MapPin, ExternalLink } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Home = () => {
+  const { toast } = useToast();
+  
+  const handleReportIncident = () => {
+    toast({
+      title: "Report Incident",
+      description: "Redirecting to incident reporting page...",
+    });
+  };
+  
+  const handleCheckInVisitor = () => {
+    toast({
+      title: "Check-in Visitor",
+      description: "Redirecting to visitor check-in page...",
+    });
+  };
+  
+  const handleEmergencyAlert = () => {
+    toast({
+      title: "Emergency Alert",
+      description: "Please confirm emergency alert activation",
+      variant: "destructive",
+    });
+  };
+
   return (
     <Layout>
       <Helmet>
-        <title>Dashboard - Campus Guardian Shield</title>
+        <title>Campus Guardian Shield - Smart, Secure, and Connected Campus</title>
         <meta 
           name="description" 
-          content="Campus Guardian Shield main dashboard - Smart, Secure, and Connected Campus" 
+          content="Campus Guardian Shield provides advanced security and management solutions for college campuses using AI, IoT, and biometrics." 
         />
       </Helmet>
       
-      <div className="space-y-8">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">Campus Guardian Dashboard</h1>
-            <p className="text-muted-foreground mt-1">
-              Smart, Secure, and Connected Campus Management
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded-md flex items-center gap-2">
-              <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              <span className="text-sm text-blue-600 dark:text-blue-400">{new Date().toLocaleString()}</span>
+      <div className="space-y-16">
+        {/* Hero Section */}
+        <section className="py-16 md:py-24 relative overflow-hidden" aria-labelledby="hero-title">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#1f2937_1px,transparent_1px)]"></div>
+          
+          {/* Hero Content */}
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center text-center space-y-8">
+              <div className="space-y-4 max-w-3xl animate-fade-in">
+                <h1 
+                  id="hero-title"
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter"
+                >
+                  Smart, Secure, and Connected Campus
+                </h1>
+                <p className="text-xl md:text-2xl text-muted-foreground">
+                  Powered by AI, IoT, and Biometrics for a Safer College Life
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xl">
+                <Button 
+                  onClick={handleReportIncident}
+                  className="cta-secondary flex-1"
+                  size="lg"
+                  asChild
+                >
+                  <Link to="/incident-reporting">
+                    <AlertCircle className="h-5 w-5 mr-2" /> Report Incident
+                  </Link>
+                </Button>
+                <Button 
+                  onClick={handleCheckInVisitor}
+                  className="cta-primary flex-1"
+                  size="lg"
+                  asChild
+                >
+                  <Link to="/visitor-management">
+                    <UserCheck className="h-5 w-5 mr-2" /> Check-in Visitor
+                  </Link>
+                </Button>
+                <Button 
+                  onClick={handleEmergencyAlert}
+                  className="cta-accent flex-1"
+                  size="lg"
+                  asChild
+                >
+                  <Link to="/emergency-alerts">
+                    <Bell className="h-5 w-5 mr-2" /> Emergency Alert
+                  </Link>
+                </Button>
+              </div>
+              
+              <div className="flex items-center justify-center mt-8 gap-2 text-muted-foreground">
+                <span className="inline-block h-2 w-2 rounded-full bg-success animate-pulse-slow"></span>
+                <span>Campus security systems active and monitoring</span>
+              </div>
             </div>
-            <Bell className="h-6 w-6 text-orange-500 cursor-pointer hover:text-orange-600 transition-colors" />
           </div>
-        </div>
+        </section>
         
-        {/* Emergency Alert Banner */}
-        <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-900 p-4 rounded-lg flex items-center gap-3">
-          <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
-          <div className="flex-grow">
-            <h3 className="font-medium text-red-700 dark:text-red-400">Active Alert: Fire Drill</h3>
-            <p className="text-sm text-red-600 dark:text-red-300">Fire drill scheduled today at 2:00 PM. All students and faculty must evacuate to designated assembly points.</p>
+        {/* About Section */}
+        <section className="py-12 bg-muted/50">
+          <div className="container px-4 md:px-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight">About Campus Guardian</h2>
+                <p className="text-muted-foreground">
+                  Campus Guardian Shield is a comprehensive security and management platform designed specifically for educational institutions. Our solution integrates cutting-edge technology with user-friendly interfaces to create a safer, more efficient campus environment.
+                </p>
+                <p className="text-muted-foreground">
+                  From visitor management and worker attendance tracking to emergency alerts and incident reporting, our platform provides the tools needed to protect your campus community while streamlining administrative processes.
+                </p>
+                <Button variant="outline" className="mt-4" asChild>
+                  <Link to="/analytics-dashboard">
+                    Explore Dashboard <ExternalLink className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="bg-gray-200 dark:bg-gray-800 rounded-lg aspect-video flex items-center justify-center">
+                <p className="text-muted-foreground text-center p-8">Campus Security Video Overview</p>
+              </div>
+            </div>
           </div>
-          <Button asChild variant="destructive" size="sm" className="flex-shrink-0">
-            <Link to="/emergency-alerts">View Details</Link>
-          </Button>
-        </div>
-        
-        {/* Quick Insights Panel */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-green-50 dark:bg-green-950">
-            <CardContent className="p-4">
-              <div className="flex flex-col">
-                <span className="text-xs text-green-600 dark:text-green-400">Verified Entries Today</span>
-                <span className="text-2xl font-bold">124</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-red-50 dark:bg-red-950">
-            <CardContent className="p-4">
-              <div className="flex flex-col">
-                <span className="text-xs text-red-600 dark:text-red-400">Unauthorized Attempts</span>
-                <span className="text-2xl font-bold">7</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-amber-50 dark:bg-amber-950">
-            <CardContent className="p-4">
-              <div className="flex flex-col">
-                <span className="text-xs text-amber-600 dark:text-amber-400">Resolved Incidents</span>
-                <span className="text-2xl font-bold">12</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-blue-50 dark:bg-blue-950">
-            <CardContent className="p-4">
-              <div className="flex flex-col">
-                <span className="text-xs text-blue-600 dark:text-blue-400">Active Bus Routes</span>
-                <span className="text-2xl font-bold">8</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Main Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Security Statistics */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <BarChart className="h-5 w-5 text-blue-500" />
-                Security Overview
-              </CardTitle>
-              <CardDescription>
-                Campus security at a glance
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
-                    <p className="text-xs text-blue-600 dark:text-blue-400">Active Incidents</p>
-                    <h3 className="text-xl font-bold">3</h3>
-                  </div>
-                  <div className="bg-green-50 dark:bg-green-950 p-3 rounded-lg">
-                    <p className="text-xs text-green-600 dark:text-green-400">Resolved Today</p>
-                    <h3 className="text-xl font-bold">12</h3>
-                  </div>
-                </div>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/admin-dashboard" className="flex items-center justify-between">
-                    <span>View Security Dashboard</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Visitor Management */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5 text-indigo-500" />
-                Visitor Management
-              </CardTitle>
-              <CardDescription>
-                Recent campus visitors
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-indigo-50 dark:bg-indigo-950 p-3 rounded-lg">
-                    <p className="text-xs text-indigo-600 dark:text-indigo-400">Today's Visitors</p>
-                    <h3 className="text-xl font-bold">24</h3>
-                  </div>
-                  <div className="bg-orange-50 dark:bg-orange-950 p-3 rounded-lg">
-                    <p className="text-xs text-orange-600 dark:text-orange-400">Pending Approvals</p>
-                    <h3 className="text-xl font-bold">5</h3>
-                  </div>
-                </div>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/visitor-management" className="flex items-center justify-between">
-                    <span>Manage Visitors</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Worker Attendance */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-violet-500" />
-                Worker Attendance
-              </CardTitle>
-              <CardDescription>
-                Staff presence today
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-violet-50 dark:bg-violet-950 p-3 rounded-lg">
-                    <p className="text-xs text-violet-600 dark:text-violet-400">Present Today</p>
-                    <h3 className="text-xl font-bold">42</h3>
-                  </div>
-                  <div className="bg-red-50 dark:bg-red-950 p-3 rounded-lg">
-                    <p className="text-xs text-red-600 dark:text-red-400">Absent</p>
-                    <h3 className="text-xl font-bold">7</h3>
-                  </div>
-                </div>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/worker-attendance" className="flex items-center justify-between">
-                    <span>View Attendance Records</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Bus Tracker */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Bus className="h-5 w-5 text-amber-500" />
-                Transport Status
-              </CardTitle>
-              <CardDescription>
-                Campus transportation
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-amber-50 dark:bg-amber-950 p-3 rounded-lg">
-                    <p className="text-xs text-amber-600 dark:text-amber-400">Active Buses</p>
-                    <h3 className="text-xl font-bold">8</h3>
-                  </div>
-                  <div className="bg-teal-50 dark:bg-teal-950 p-3 rounded-lg">
-                    <p className="text-xs text-teal-600 dark:text-teal-400">Next Departure</p>
-                    <h3 className="text-sm font-bold">5 min</h3>
-                  </div>
-                </div>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/bus-tracker" className="flex items-center justify-between">
-                    <span>View Bus Tracker</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Communications Hub */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Megaphone className="h-5 w-5 text-purple-500" />
-                Communication Hub
-              </CardTitle>
-              <CardDescription>
-                Latest announcements and messaging
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="bg-purple-50 dark:bg-purple-950 p-3 rounded-lg">
-                  <p className="text-xs text-purple-600 dark:text-purple-400">Latest Announcement</p>
-                  <p className="text-sm mt-1">Library hours extended to 10PM for final exam week</p>
-                  <Badge className="mt-2 bg-purple-200 text-purple-800">2 hours ago</Badge>
-                </div>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/communication-hub" className="flex items-center justify-between">
-                    <span>View Communication Hub</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Safety Tips */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Shield className="h-5 w-5 text-green-500" />
-                Safety Resources
-              </CardTitle>
-              <CardDescription>
-                Campus safety information
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="bg-green-50 dark:bg-green-950 p-3 rounded-lg">
-                  <p className="text-xs text-green-600 dark:text-green-400">Safety Tip of the Day</p>
-                  <p className="text-sm mt-1">Always be aware of your surroundings and report suspicious activities immediately.</p>
-                </div>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/safety-tips" className="flex items-center justify-between">
-                    <span>Explore Safety Tips</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <FileText className="h-5 w-5 text-gray-500" />
-              Recent Activity
-            </CardTitle>
-            <CardDescription>
-              Latest reports and incident updates
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-full">
-                  <FileText className="h-4 w-4 text-blue-500" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Suspicious activity reported near Science Building</p>
-                  <p className="text-xs text-muted-foreground mt-1">Submitted 35 minutes ago • <span className="text-amber-500">Under Review</span></p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="bg-green-100 dark:bg-green-900 p-2 rounded-full">
-                  <Shield className="h-4 w-4 text-green-500" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Lost ID card reported - ID #STU20241234</p>
-                  <p className="text-xs text-muted-foreground mt-1">Submitted 1 hour ago • <span className="text-green-500">Resolved</span></p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="bg-purple-100 dark:bg-purple-900 p-2 rounded-full">
-                  <Megaphone className="h-4 w-4 text-purple-500" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Voice message broadcast: Faculty meeting reminder</p>
-                  <p className="text-xs text-muted-foreground mt-1">2 hours ago • Sent to 45 recipients</p>
-                </div>
-              </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="py-12">
+          <div className="container px-4 md:px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tight">What Our Campus Community Says</h2>
+              <p className="text-muted-foreground mt-2">Feedback from students, faculty, and security personnel</p>
             </div>
             
-            <Button asChild variant="outline" className="w-full mt-4">
-              <Link to="/incident-reporting" className="flex items-center justify-between">
-                <span>View All Reports</span>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    <p className="italic">"The Campus Guardian Shield has completely transformed how we approach security. The visitor management system has made check-ins seamless and secure."</p>
+                    <div>
+                      <p className="font-medium">Dr. Sarah Johnson</p>
+                      <p className="text-sm text-muted-foreground">Campus Security Director</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    <p className="italic">"I feel much safer knowing that the campus has implemented this system. The emergency alerts have been particularly helpful during weather emergencies."</p>
+                    <div>
+                      <p className="font-medium">Michael Rodriguez</p>
+                      <p className="text-sm text-muted-foreground">Student, Computer Science</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    <p className="italic">"The incident reporting system makes it easy to report concerns and track their resolution. It's greatly improved communication between students and administration."</p>
+                    <div>
+                      <p className="font-medium">Professor Emma Chen</p>
+                      <p className="text-sm text-muted-foreground">Faculty, Engineering Department</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
         
-        {/* Quick Access Navigation Tiles */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Button asChild variant="outline" className="h-auto py-6 flex flex-col gap-2">
-            <Link to="/emergency-alerts" className="text-red-600 hover:text-red-700">
-              <AlertTriangle className="h-6 w-6 mb-1" />
-              <span>Emergency Alerts</span>
-            </Link>
-          </Button>
-          
-          <Button asChild variant="outline" className="h-auto py-6 flex flex-col gap-2">
-            <Link to="/communication-hub" className="text-blue-600 hover:text-blue-700">
-              <Megaphone className="h-6 w-6 mb-1" />
-              <span>Communication Hub</span>
-            </Link>
-          </Button>
-          
-          <Button asChild variant="outline" className="h-auto py-6 flex flex-col gap-2">
-            <Link to="/incident-reporting" className="text-amber-600 hover:text-amber-700">
-              <FileText className="h-6 w-6 mb-1" />
-              <span>Report Incident</span>
-            </Link>
-          </Button>
-          
-          <Button asChild variant="outline" className="h-auto py-6 flex flex-col gap-2">
-            <Link to="/settings" className="text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-              <SettingsIcon className="h-6 w-6 mb-1" />
-              <span>Settings</span>
-            </Link>
-          </Button>
-        </div>
+        {/* Quick Links */}
+        <section className="py-12 bg-muted/50">
+          <div className="container px-4 md:px-6">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold tracking-tight">Quick Links</h2>
+              <p className="text-muted-foreground mt-2">Access our most popular features</p>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/visitor-management">
+                  <UserCheck className="h-6 w-6" />
+                  <span>Visitor Management</span>
+                </Link>
+              </Button>
+              
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/emergency-alerts">
+                  <Bell className="h-6 w-6" />
+                  <span>Emergency Alerts</span>
+                </Link>
+              </Button>
+              
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/incident-reporting">
+                  <AlertCircle className="h-6 w-6" />
+                  <span>Incident Reporting</span>
+                </Link>
+              </Button>
+              
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                <Link to="/analytics-dashboard">
+                  <ExternalLink className="h-6 w-6" />
+                  <span>Analytics Dashboard</span>
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+        
+        {/* About College & Contact Information */}
+        <section className="py-12">
+          <div className="container px-4 md:px-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              {/* About College */}
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight">About Our College</h2>
+                <p className="text-muted-foreground">
+                  Founded in 1965, our institution has been at the forefront of education and innovation for over five decades. With a commitment to excellence, we provide a safe and enriching environment for our diverse student body and faculty.
+                </p>
+                <p className="text-muted-foreground">
+                  Campus Guardian Shield is just one example of our dedication to using technology to enhance the campus experience and ensure the wellbeing of our community.
+                </p>
+              </div>
+              
+              {/* Contact Information */}
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tight">Contact Information</h2>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-5 w-5 text-primary" />
+                    <p>Emergency: (555) 123-4567</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-5 w-5 text-muted-foreground" />
+                    <p>Main Office: (555) 987-6543</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-5 w-5 text-muted-foreground" />
+                    <p>info@campusguardian.edu</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-muted-foreground" />
+                    <p>123 University Avenue, College Town, CT 12345</p>
+                  </div>
+                </div>
+                <Button className="mt-4">Contact Us</Button>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </Layout>
   );
