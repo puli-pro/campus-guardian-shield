@@ -23,7 +23,17 @@ import {
   Settings as SettingsIcon,
   Bus as BusIcon,
   Users as UsersIcon,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  Camera,
+  Languages,
+  Save,
+  RefreshCw,
+  UserCog,
+  Monitor,
+  HardDrive,
+  MessageSquare,
+  Bug,
+  Lightbulb
 } from "lucide-react";
 import { 
   Tabs, 
@@ -47,6 +57,14 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Settings = () => {
   const { toast } = useToast();
