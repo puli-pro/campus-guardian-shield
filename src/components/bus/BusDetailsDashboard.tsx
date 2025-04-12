@@ -1,11 +1,13 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Calendar, Search } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { API_BASE_URL } from "../Constants";
+import axios from "axios";
 
 // Sample data
 const BUSES = [
@@ -61,35 +63,41 @@ const BUSES = [
   }
 ];
 
-const BusDetailsDashboard = () => {
+const BusDetailsDashboard = ({ destinationsData, busesData }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [destinationFilter, setDestinationFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
+
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "onCampus":
+      case "in_campus":
         return <Badge className="bg-green-500">On Campus</Badge>;
-      case "scheduled":
-        return <Badge className="bg-orange-500">Scheduled</Badge>;
-      case "departed":
-        return <Badge className="bg-red-500">Departed</Badge>;
+      case "out_campus":
+        return <Badge className="bg-orange-500">Out of campus</Badge>;
+      // case "departed":
+      //   return <Badge className="bg-red-500">Departed</Badge>;
       default:
         return <Badge>Unknown</Badge>;
     }
   };
 
   // Filter buses based on search term and filters
-  const filteredBuses = BUSES.filter(bus => {
-    const matchesSearch = 
-      bus.busNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bus.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bus.driverName.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesDestination = destinationFilter === "all" || bus.destination === destinationFilter;
-    const matchesStatus = statusFilter === "all" || bus.status === statusFilter;
-    
+  // const filteredBuses = BUSES.filter(bus => {
+  const filteredBuses = busesData.filter(bus => {
+    const matchesSearch =
+      // bus.busNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      // bus.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      // bus.driverName.toLowerCase().includes(searchTerm.toLowerCase());
+      bus.plate_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bus?.next_trip?.route?.end_point.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bus.driver.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesDestination = destinationFilter === "all" || bus?.next_trip?.route?.end_point === destinationFilter;
+    const matchesStatus = statusFilter === "all" || bus.location_status === statusFilter;
+
     return matchesSearch && matchesDestination && matchesStatus;
+    // return bus
   });
 
   // Get unique destinations for filter
@@ -117,7 +125,7 @@ const BusDetailsDashboard = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           <div className="flex flex-1 gap-2">
             <Select value={destinationFilter} onValueChange={setDestinationFilter}>
               <SelectTrigger>
@@ -125,26 +133,32 @@ const BusDetailsDashboard = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Destinations</SelectItem>
-                {destinations.map(dest => (
+                {/* {destinations.map(dest => (
+                  <SelectItem key={dest} value={dest}>{dest}</SelectItem>
+                ))} */}
+                {destinationsData.map(dest => (
                   <SelectItem key={dest} value={dest}>{dest}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="onCampus">On Campus</SelectItem>
+                {/* <SelectItem value="onCampus">On Campus</SelectItem>
                 <SelectItem value="scheduled">Scheduled</SelectItem>
-                <SelectItem value="departed">Departed</SelectItem>
+                <SelectItem value="departed">Departed</SelectItem> */}
+                <SelectItem value="in_campus">On Campus</SelectItem>
+                <SelectItem value="out_campus">Out of Campus</SelectItem>
+                {/* <SelectItem value="Departed">Departed</SelectItem> */}
               </SelectContent>
             </Select>
           </div>
         </div>
-        
+
         <div className="border rounded-md overflow-hidden">
           <Table>
             <TableHeader>
@@ -162,13 +176,16 @@ const BusDetailsDashboard = () => {
               {filteredBuses.length > 0 ? (
                 filteredBuses.map((bus) => (
                   <TableRow key={bus.id}>
-                    <TableCell className="font-medium">{bus.busNumber}</TableCell>
-                    <TableCell>{bus.destination}</TableCell>
-                    <TableCell>{bus.departureTime}</TableCell>
-                    <TableCell>{bus.driverName}</TableCell>
-                    <TableCell>{getStatusBadge(bus.status)}</TableCell>
-                    <TableCell>{bus.lastEntry}</TableCell>
-                    <TableCell>{bus.lastExit}</TableCell>
+                    {/* <TableCell className="font-medium">{bus.busNumber}</TableCell> */}
+                    <TableCell className="font-medium">{bus.plate_number}</TableCell>
+                    {/* <TableCell>{bus.destination}</TableCell> */}
+                    <TableCell>{bus?.next_trip?.route?.end_point}</TableCell>
+                    <TableCell>{bus?.next_trip?.route?.start_point}</TableCell>
+                    <TableCell>{bus?.driver?.name}</TableCell>
+                    <TableCell>{getStatusBadge(bus.location_status)}</TableCell>
+                    <TableCell>{bus?.last_trip?.arrival_time ? new Date(bus?.last_trip?.arrival_time).toLocaleString() : '-'}</TableCell>
+                    {/* <TableCell>{bus.lastExit}</TableCell> */}
+                    <TableCell>{bus?.next_trip?.arrival_time ? new Date(bus?.next_trip?.arrival_time).toLocaleString() : '-'}</TableCell>
                   </TableRow>
                 ))
               ) : (

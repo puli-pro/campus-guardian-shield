@@ -1,16 +1,16 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  AlertTriangle, 
-  Bell, 
-  Clock, 
-  Send, 
-  Shield, 
-  Info, 
-  CheckCircle, 
-  Calendar, 
+import {
+  AlertTriangle,
+  Bell,
+  Clock,
+  Send,
+  Shield,
+  Info,
+  CheckCircle,
+  Calendar,
   X,
   SlidersHorizontal
 } from "lucide-react";
@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -31,6 +31,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import axios from "axios";
+import { API_BASE_URL } from "../Constants";
 
 type AlertType = "critical" | "security" | "warning" | "clear";
 
@@ -75,7 +77,7 @@ const AlertBroadcast = () => {
   const [message, setMessage] = useState("");
   const [expiryHours, setExpiryHours] = useState("1");
   const [filterType, setFilterType] = useState<string>("all");
-  
+
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([
     {
       id: "1",
@@ -110,8 +112,19 @@ const AlertBroadcast = () => {
       sender: "Security Office"
     }
   ]);
-  
-  const sendAlert = () => {
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/alerts/`);
+        setAlerts(response.data)
+      } catch (error) {
+        console.error('Error fetching alerts:', error.response?.data || error.message);
+      }
+    })();
+  }, []);
+
+  const sendAlert = async () => {
     if (!message.trim()) {
       toast({
         title: "Alert message is required",
@@ -120,25 +133,39 @@ const AlertBroadcast = () => {
       });
       return;
     }
-    
-    const newAlert: EmergencyAlert = {
-      id: Date.now().toString(),
+
+    const payload = {
       message,
       type: alertType,
-      timestamp: new Date(),
-      expiry: expiryHours ? new Date(Date.now() + parseInt(expiryHours) * 60 * 60000) : null,
+      expiry: expiryHours ? new Date(Date.now() + parseInt(expiryHours) * 60 * 60000).toISOString() : null,
       sender: "Admin User"
     };
-    
-    setAlerts([newAlert, ...alerts]);
-    setMessage("");
-    
-    toast({
-      title: "Alert sent successfully",
-      description: `The ${alertType} alert has been broadcast to all platforms.`,
-    });
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/alerts/`, payload, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      const savedAlert = response.data;
+
+      setAlerts(prev => [savedAlert, ...prev]);
+      setMessage("");
+
+      toast({
+        title: "Alert sent successfully",
+        description: `The ${alertType} alert has been broadcast to all platforms.`,
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to send alert",
+        description: (err as Error).message,
+        variant: "destructive"
+      });
+    }
   };
-  
+
   const deleteAlert = (id: string) => {
     setAlerts(alerts.filter(alert => alert.id !== id));
     toast({
@@ -146,17 +173,17 @@ const AlertBroadcast = () => {
       description: "The alert has been removed from all platforms.",
     });
   };
-  
+
   const filteredAlerts = alerts.filter(alert => {
     if (filterType === "all") return true;
     return alert.type === filterType;
   });
-  
+
   const isExpired = (alert: EmergencyAlert) => {
     if (!alert.expiry) return false;
     return new Date() > alert.expiry;
   };
-  
+
   return (
     <Card>
       <CardHeader>
@@ -173,7 +200,7 @@ const AlertBroadcast = () => {
             <TabsTrigger value="compose">Compose Alert</TabsTrigger>
             <TabsTrigger value="history">Alert History</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="compose" className="space-y-4 mt-4">
             <div className="space-y-4">
               <div>
@@ -210,18 +237,18 @@ const AlertBroadcast = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <Label htmlFor="message">Alert Message</Label>
-                <Textarea 
+                <Textarea
                   id="message"
-                  placeholder="Enter emergency alert message here..." 
+                  placeholder="Enter emergency alert message here..."
                   className="min-h-[100px]"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="expiry">Expiry Time (hours)</Label>
                 <Select value={expiryHours} onValueChange={setExpiryHours}>
@@ -238,7 +265,7 @@ const AlertBroadcast = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="flex flex-wrap gap-2 pt-2">
                 <Button onClick={sendAlert} className="gap-2">
                   <Send className="h-4 w-4" /> Broadcast Alert
@@ -249,11 +276,11 @@ const AlertBroadcast = () => {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="history" className="mt-4">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-sm font-medium">Alert History</h3>
-              
+
               <div className="flex items-center gap-2">
                 <Popover>
                   <PopoverTrigger asChild>
@@ -282,12 +309,12 @@ const AlertBroadcast = () => {
                 </Popover>
               </div>
             </div>
-            
+
             <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
               {filteredAlerts.length > 0 ? (
                 filteredAlerts.map((alert) => (
-                  <div 
-                    key={alert.id} 
+                  <div
+                    key={alert.id}
                     className={`p-3 border rounded-lg ${getAlertClass(alert.type)} ${isExpired(alert) ? 'opacity-60' : ''}`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -300,34 +327,34 @@ const AlertBroadcast = () => {
                           </span>
                         )}
                       </div>
-                      
+
                       <div className="flex items-center gap-1">
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="icon"
-                          className="h-7 w-7" 
+                          className="h-7 w-7"
                           onClick={() => deleteAlert(alert.id)}
                         >
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                    
+
                     <p className="text-sm mb-2">{alert.message}</p>
-                    
+
                     <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
                       <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" /> 
+                        <Calendar className="h-3 w-3" />
                         {alert.timestamp.toLocaleString()}
                       </span>
-                      
+
                       {alert.expiry && (
                         <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" /> 
+                          <Clock className="h-3 w-3" />
                           Expires: {alert.expiry.toLocaleString()}
                         </span>
                       )}
-                      
+
                       <span>Sent by: {alert.sender}</span>
                     </div>
                   </div>

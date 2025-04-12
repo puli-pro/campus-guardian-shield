@@ -26,6 +26,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { API_BASE_URL } from "../Constants";
+import axios from "axios";
 
 interface Announcement {
   id: string;
@@ -109,6 +110,17 @@ const CampusAnnouncements = () => {
       response: "We've scheduled repairs for the lighting. Thank you for bringing this to our attention."
     }
   ]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/communication/announcements/`);
+        setAnnouncements(response.data)
+      } catch (error) {
+        console.error('Error fetching faculty:', error.response?.data || error.message);
+      }
+    })();
+  }, []);
 
   const submitFeedback = async (data: any) => {
     const payload = {
@@ -378,7 +390,7 @@ const CampusAnnouncements = () => {
                             {item.isAnonymous ? "Anonymous User" : "You"}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {new Date(item.timestamp).toDateString()}
+                            {new Date(item.created_at).toDateString()}
                           </span>
                         </div>
 

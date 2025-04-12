@@ -214,6 +214,16 @@ const VoiceMessaging = () => {
 
   console.log(voiceMsgsData)
 
+  const audioRefs = useRef<any>({});
+
+  const handlePlay = (playingId: string) => {
+    Object.entries(audioRefs.current).forEach(([id, audio]: any) => {
+      if (id.toString() !== playingId.toString() && audio && !audio.paused) {
+        audio.pause();
+      }
+    });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -294,7 +304,7 @@ const VoiceMessaging = () => {
         <div>
           <h3 className="text-sm font-medium mb-2">Recent Voice Messages</h3>
           <div className="space-y-2 max-h-80 overflow-y-auto pr-2">
-            {messages.map((message) => (
+            {voiceMsgsData.map((message) => (
               <div
                 key={message.id}
                 className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
@@ -302,21 +312,46 @@ const VoiceMessaging = () => {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{message.title}</p>
                   <div className="flex items-center text-sm text-muted-foreground">
-                    <span className="truncate">{message.sender}</span>
+                    <span className="truncate">
+                      {message.user_data?.full_name || "Unknown Sender"}
+                    </span>
                     <span className="mx-1">•</span>
-                    <span>{message.date.toLocaleDateString()}</span>
+                    <span>
+                      {new Date(message.created_at).toLocaleDateString()}{" "}
+                      {new Date(message.created_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2 ml-2">
-                  <span className="text-xs text-muted-foreground">{message.duration}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => togglePlayMessage(message.id)}
-                    aria-label={message.isPlaying ? "Pause message" : "Play message"}
+                  {/* <audio
+                    controls
+                    src={message.audio_file}
+                    ref={(el) => (audioRefs.current[message.id] = el)}
+                    onPlay={() => handlePlay(message.id)}
+                  /> */}
+                  <audio
+                    controls
+                    ref={(el) => (audioRefs.current[message.id] = el)}
+                    onPlay={() => handlePlay(message.id)}
                   >
-                    {message.isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                  </Button>
+                    <source src={message.audio_file} />
+                    Your browser does not support the audio element.
+                  </audio>
+                  {/* <audio
+                    controls
+                    // ref={(el) => (audioRefs.current[message.id] = el)}
+                    onPlay={(e) => {
+                      console.log(e)
+                      // e.audio.pause()
+                    }}
+                  >
+                    <source src={message.audio_file} />
+                    Your browser does not support the audio element.
+                  </audio> */}
                 </div>
               </div>
             ))}
