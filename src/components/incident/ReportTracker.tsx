@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,7 @@ interface IncidentReport {
   response?: string;
   lastUpdated: Date;
   comments?: string[];
+  evidence?: string | null;
 }
 
 const getStatusIcon = (status: ReportStatus) => {
@@ -125,6 +126,25 @@ const ReportTracker = () => {
       comments: []
     }
   ]);
+  
+  // Listen for new reports from the SubmitReportForm component
+  useEffect(() => {
+    const handleReportSubmitted = (event: CustomEvent) => {
+      const newReport = event.detail.report;
+      setMyReports(prevReports => [newReport, ...prevReports]);
+      
+      toast({
+        title: "Report Added",
+        description: `Report ${newReport.id} has been added to your tracker`,
+      });
+    };
+    
+    document.addEventListener('reportSubmitted', handleReportSubmitted as EventListener);
+    
+    return () => {
+      document.removeEventListener('reportSubmitted', handleReportSubmitted as EventListener);
+    };
+  }, [toast]);
   
   const filteredReports = myReports.filter(report => 
     report.type.includes(searchTerm.toLowerCase()) || 
@@ -225,6 +245,19 @@ const ReportTracker = () => {
                 <div>
                   <h4 className="text-sm font-medium">Location</h4>
                   <p className="text-sm mt-1">{selectedReport.location}</p>
+                </div>
+              )}
+              
+              {selectedReport.evidence && (
+                <div>
+                  <h4 className="text-sm font-medium">Evidence</h4>
+                  <div className="mt-2 rounded-md overflow-hidden border">
+                    <img 
+                      src={selectedReport.evidence} 
+                      alt="Incident evidence" 
+                      className="max-h-48 object-contain" 
+                    />
+                  </div>
                 </div>
               )}
               

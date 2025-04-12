@@ -1,488 +1,526 @@
 
-import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  AlertTriangle, 
-  Bell, 
-  Clock, 
-  Send, 
-  Shield, 
-  Info, 
-  CheckCircle, 
-  Calendar, 
-  X,
-  SlidersHorizontal,
-  Eye
-} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { 
+  Bell, 
+  Megaphone, 
+  AlertTriangle, 
+  Clock, 
+  Search, 
+  ChevronDown, 
+  ChevronUp,
+  AlertOctagon,
+  Users,
+  MapPin,
+  Send,
+  Eye
+} from "lucide-react";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
 
-type AlertType = "critical" | "security" | "warning" | "clear";
+type AlertType = "emergency" | "weather" | "security" | "announcement" | "sos" | "safe" | "help";
+type AlertStatus = "active" | "resolved" | "scheduled" | "pending";
 
-interface EmergencyAlert {
+interface CampusAlert {
   id: string;
-  message: string;
   type: AlertType;
+  title: string;
+  message: string;
   timestamp: Date;
-  expiry: Date | null;
-  sender: string;
-  sos?: boolean;
+  status: AlertStatus;
+  senderId?: string;
+  location?: string;
+  affectedAreas?: string[];
+  expiresAt?: Date;
 }
-
-const getAlertIcon = (type: AlertType) => {
-  switch (type) {
-    case "critical":
-      return <AlertTriangle className="h-5 w-5 text-red-500" />;
-    case "security":
-      return <Shield className="h-5 w-5 text-orange-500" />;
-    case "warning":
-      return <Info className="h-5 w-5 text-yellow-500" />;
-    case "clear":
-      return <CheckCircle className="h-5 w-5 text-green-500" />;
-  }
-};
-
-const getAlertClass = (type: AlertType) => {
-  switch (type) {
-    case "critical":
-      return "bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-900";
-    case "security":
-      return "bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-900";
-    case "warning":
-      return "bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-900";
-    case "clear":
-      return "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-900";
-  }
-};
 
 const AlertBroadcast = () => {
   const { toast } = useToast();
-  const [alertType, setAlertType] = useState<AlertType>("warning");
-  const [message, setMessage] = useState("");
-  const [expiryHours, setExpiryHours] = useState("1");
-  const [filterType, setFilterType] = useState<string>("all");
-  const [activeTab, setActiveTab] = useState("compose");
-  const [previewAlert, setPreviewAlert] = useState<EmergencyAlert | null>(null);
+  const [activeTab, setActiveTab] = useState("broadcast");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [expandedAlerts, setExpandedAlerts] = useState<string[]>([]);
   
-  const [alerts, setAlerts] = useState<EmergencyAlert[]>([
+  const [alertForm, setAlertForm] = useState({
+    type: "emergency",
+    title: "",
+    message: "",
+    affectedAreas: [] as string[],
+    sendToAll: true
+  });
+  
+  const [alertHistory, setAlertHistory] = useState<CampusAlert[]>([
     {
-      id: "1",
+      id: "A-1001",
+      type: "emergency",
+      title: "Fire Drill",
       message: "Fire drill scheduled today at 2:00 PM. All students and faculty must evacuate to designated assembly points.",
-      type: "warning",
-      timestamp: new Date(Date.now() - 30 * 60000), // 30 minutes ago
-      expiry: new Date(Date.now() + 2 * 60 * 60000), // expires in 2 hours
-      sender: "Campus Safety Director"
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      status: "active",
+      affectedAreas: ["Main Campus", "Science Building", "Library"],
+      expiresAt: new Date(Date.now() + 4 * 60 * 60 * 1000) // 4 hours from now
     },
     {
-      id: "2",
-      message: "Suspicious individual reported near the east campus gate. Security personnel have been dispatched. Avoid this area until further notice.",
+      id: "A-1000",
+      type: "weather",
+      title: "Severe Weather Warning",
+      message: "Heavy rain and potential flooding expected. All outdoor activities are canceled until further notice.",
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+      status: "active",
+      affectedAreas: ["Entire Campus"],
+      expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000) // 2 days from now
+    },
+    {
+      id: "A-999",
       type: "security",
-      timestamp: new Date(Date.now() - 45 * 60000), // 45 minutes ago
-      expiry: new Date(Date.now() + 60 * 60000), // expires in 1 hour
-      sender: "Security Office"
+      title: "Suspicious Activity",
+      message: "Security personnel investigating suspicious activity near the north parking lot. Please avoid the area.",
+      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+      status: "resolved",
+      affectedAreas: ["North Parking Lot"]
     },
     {
-      id: "3",
-      message: "SEVERE WEATHER ALERT: Thunderstorm warning in effect. Seek shelter indoors away from windows immediately.",
-      type: "critical",
-      timestamp: new Date(Date.now() - 15 * 60000), // 15 minutes ago
-      expiry: null, // no expiry
-      sender: "Emergency Response Team"
-    },
-    {
-      id: "4",
-      message: "All clear for the previously reported suspicious individual. Normal activities may resume.",
-      type: "clear",
-      timestamp: new Date(Date.now() - 10 * 60000), // 10 minutes ago
-      expiry: null,
-      sender: "Security Office"
-    },
-    {
-      id: "5",
-      message: "SOS EMERGENCY: Student reported being trapped in elevator in Science Building. Emergency services have been dispatched.",
-      type: "critical",
-      timestamp: new Date(Date.now() - 5 * 60000), // 5 minutes ago
-      expiry: null,
-      sender: "Emergency Response Team",
-      sos: true
+      id: "A-998",
+      type: "announcement",
+      title: "Library Hours Extended",
+      message: "The main library will extend its opening hours to 10PM during finals week starting Monday.",
+      timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+      status: "active",
+      affectedAreas: ["Library"]
     }
   ]);
   
-  const sendAlert = () => {
-    if (!message.trim()) {
-      toast({
-        title: "Alert message is required",
-        description: "Please enter a message for the alert.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    const newAlert: EmergencyAlert = {
-      id: Date.now().toString(),
-      message,
-      type: alertType,
-      timestamp: new Date(),
-      expiry: expiryHours ? new Date(Date.now() + parseInt(expiryHours) * 60 * 60000) : null,
-      sender: "Admin User"
-    };
-    
-    setAlerts([newAlert, ...alerts]);
-    setMessage("");
-    setActiveTab("history");
-    
-    toast({
-      title: "Alert sent successfully",
-      description: `The ${alertType} alert has been broadcast to all platforms.`,
-    });
-  };
-  
-  const deleteAlert = (id: string) => {
-    setAlerts(alerts.filter(alert => alert.id !== id));
-    toast({
-      title: "Alert deleted",
-      description: "The alert has been removed from all platforms.",
-    });
-  };
-  
-  const handleSOSAlert = (status: "safe" | "need-help") => {
-    const sosMessage = status === "safe" 
-      ? "I am SAFE and not in danger. My current location is secure."
-      : "I NEED HELP. Please send assistance to my current location immediately.";
+  // Listen for SOS alerts from QuickActionPanel
+  useEffect(() => {
+    const handleSosAlert = (event: CustomEvent) => {
+      const { type, timestamp, location, status, message } = event.detail;
       
-    const newAlert: EmergencyAlert = {
-      id: Date.now().toString(),
-      message: sosMessage,
-      type: status === "safe" ? "clear" : "critical",
-      timestamp: new Date(),
-      expiry: null,
-      sender: "Mobile User",
-      sos: true
+      const newAlertId = `A-${Math.floor(1000 + Math.random() * 9000)}`;
+      
+      let title = "Emergency SOS Alert";
+      let alertMessage = "User has triggered an emergency SOS alert. Security personnel dispatched.";
+      let alertType: AlertType = "sos";
+      let alertStatus: AlertStatus = "active";
+      
+      if (type === "safe") {
+        title = "User Marked as Safe";
+        alertMessage = message || "User has marked themselves as safe after an emergency alert.";
+        alertType = "safe";
+        alertStatus = "resolved";
+      } else if (type === "help") {
+        title = "Assistance Requested";
+        alertMessage = message || "User has requested assistance. Security personnel responding.";
+        alertType = "help";
+        alertStatus = "pending";
+      }
+      
+      const newAlert: CampusAlert = {
+        id: newAlertId,
+        type: alertType,
+        title,
+        message: alertMessage,
+        timestamp: timestamp || new Date(),
+        status: alertStatus,
+        location
+      };
+      
+      setAlertHistory(prev => [newAlert, ...prev]);
+      
+      // Switch to history tab to show the new alert
+      setActiveTab("history");
+      
+      // Expand the new alert
+      setExpandedAlerts(prev => [...prev, newAlertId]);
     };
     
-    setAlerts([newAlert, ...alerts]);
-    setActiveTab("history");
+    document.addEventListener('sosAlert', handleSosAlert as EventListener);
     
-    toast({
-      title: status === "safe" ? "Safe Status Reported" : "Help Request Sent",
-      description: status === "safe" 
-        ? "Your status has been updated to SAFE in the system."
-        : "Emergency services have been notified and assistance is on the way.",
-      variant: status === "safe" ? "default" : "destructive"
+    return () => {
+      document.removeEventListener('sosAlert', handleSosAlert as EventListener);
+    };
+  }, []);
+  
+  const toggleAlertExpand = (id: string) => {
+    setExpandedAlerts(prev => 
+      prev.includes(id) 
+        ? prev.filter(alertId => alertId !== id) 
+        : [...prev, id]
+    );
+  };
+  
+  const handleAlertInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setAlertForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleTypeChange = (value: string) => {
+    setAlertForm(prev => ({
+      ...prev,
+      type: value as AlertType
+    }));
+  };
+  
+  const handleCheckboxChange = (checked: boolean) => {
+    setAlertForm(prev => ({
+      ...prev,
+      sendToAll: checked
+    }));
+  };
+  
+  const handleAffectedAreaChange = (area: string) => {
+    setAlertForm(prev => {
+      if (prev.affectedAreas.includes(area)) {
+        return {
+          ...prev,
+          affectedAreas: prev.affectedAreas.filter(a => a !== area)
+        };
+      } else {
+        return {
+          ...prev,
+          affectedAreas: [...prev.affectedAreas, area]
+        };
+      }
     });
   };
   
-  const filteredAlerts = alerts.filter(alert => {
-    if (filterType === "all") return true;
-    if (filterType === "sos") return alert.sos === true;
-    return alert.type === filterType;
-  });
-  
-  const isExpired = (alert: EmergencyAlert) => {
-    if (!alert.expiry) return false;
-    return new Date() > alert.expiry;
-  };
-
-  const handlePreview = () => {
-    if (!message.trim()) {
+  const broadcastAlert = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!alertForm.title.trim()) {
       toast({
-        title: "No message to preview",
-        description: "Please enter an alert message first.",
+        title: "Missing Information",
+        description: "Please provide an alert title.",
         variant: "destructive"
       });
       return;
     }
-
-    const previewData: EmergencyAlert = {
-      id: "preview",
-      message,
-      type: alertType,
+    
+    if (!alertForm.message.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please provide an alert message.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!alertForm.sendToAll && alertForm.affectedAreas.length === 0) {
+      toast({
+        title: "Missing Information",
+        description: "Please select at least one affected area or check 'Send to All'.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const newAlert: CampusAlert = {
+      id: `A-${Math.floor(1000 + Math.random() * 9000)}`,
+      type: alertForm.type as AlertType,
+      title: alertForm.title,
+      message: alertForm.message,
       timestamp: new Date(),
-      expiry: expiryHours ? new Date(Date.now() + parseInt(expiryHours) * 60 * 60000) : null,
-      sender: "Admin User (Preview)"
+      status: "active",
+      affectedAreas: alertForm.sendToAll ? ["Entire Campus"] : alertForm.affectedAreas
     };
-
-    setPreviewAlert(previewData);
+    
+    setAlertHistory(prev => [newAlert, ...prev]);
+    
+    toast({
+      title: "Alert Broadcasted",
+      description: "Your alert has been sent to all affected areas.",
+    });
+    
+    // Reset form
+    setAlertForm({
+      type: "emergency",
+      title: "",
+      message: "",
+      affectedAreas: [],
+      sendToAll: true
+    });
+    
+    // Switch to history tab to show the new alert
+    setActiveTab("history");
+  };
+  
+  const filteredAlerts = alertHistory.filter(alert => 
+    alert.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    alert.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (alert.affectedAreas && alert.affectedAreas.some(area => 
+      area.toLowerCase().includes(searchTerm.toLowerCase())
+    ))
+  );
+  
+  const getAlertIcon = (type: AlertType) => {
+    switch (type) {
+      case "emergency":
+        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+      case "weather":
+        return <AlertOctagon className="h-5 w-5 text-amber-500" />;
+      case "security":
+        return <AlertOctagon className="h-5 w-5 text-blue-500" />;
+      case "announcement":
+        return <Megaphone className="h-5 w-5 text-indigo-500" />;
+      case "sos":
+        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+      case "safe":
+        return <Users className="h-5 w-5 text-green-500" />;
+      case "help":
+        return <AlertOctagon className="h-5 w-5 text-orange-500" />;
+      default:
+        return <Bell className="h-5 w-5 text-gray-500" />;
+    }
+  };
+  
+  const getAlertStatusBadge = (status: AlertStatus) => {
+    switch (status) {
+      case "active":
+        return <Badge className="bg-red-500">Active</Badge>;
+      case "resolved":
+        return <Badge className="bg-green-500">Resolved</Badge>;
+      case "scheduled":
+        return <Badge className="bg-blue-500">Scheduled</Badge>;
+      case "pending":
+        return <Badge className="bg-amber-500">Pending</Badge>;
+      default:
+        return <Badge className="bg-gray-500">Unknown</Badge>;
+    }
+  };
+  
+  const previewAlert = () => {
+    toast({
+      title: alertForm.title || "Alert Preview",
+      description: alertForm.message || "Your alert message will appear here.",
+      variant: alertForm.type === "emergency" ? "destructive" : "default",
+    });
   };
   
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" /> Alert Broadcast System
+          <Bell className="h-5 w-5" /> Emergency Alerts & Notifications
         </CardTitle>
         <CardDescription>
-          Send campus-wide emergency alerts and notifications
+          Broadcast emergency alerts and view alert history
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="compose" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="compose">Compose Alert</TabsTrigger>
-            <TabsTrigger value="history">Alert History</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid grid-cols-2">
+            <TabsTrigger value="broadcast" className="flex items-center gap-2">
+              <Megaphone className="h-4 w-4" />
+              <span>Broadcast Alert</span>
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              <span>Alert History</span>
+            </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="compose" className="space-y-4 mt-4">
-            <div className="space-y-4">
-              <div>
+          <TabsContent value="broadcast" className="space-y-4">
+            <form onSubmit={broadcastAlert} className="space-y-4">
+              <div className="space-y-2">
                 <Label htmlFor="alert-type">Alert Type</Label>
-                <Select value={alertType} onValueChange={(value: AlertType) => setAlertType(value)}>
-                  <SelectTrigger className="w-full">
+                <Select
+                  value={alertForm.type}
+                  onValueChange={handleTypeChange}
+                >
+                  <SelectTrigger id="alert-type">
                     <SelectValue placeholder="Select alert type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="critical" className="flex items-center text-red-600">
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4" />
-                        <span>Critical Emergency</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="security" className="text-orange-600">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4" />
-                        <span>Security Alert</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="warning" className="text-yellow-600">
-                      <div className="flex items-center gap-2">
-                        <Info className="h-4 w-4" />
-                        <span>General Warning</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="clear" className="text-green-600">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4" />
-                        <span>All Clear</span>
-                      </div>
-                    </SelectItem>
+                    <SelectItem value="emergency">Emergency Alert</SelectItem>
+                    <SelectItem value="weather">Weather Alert</SelectItem>
+                    <SelectItem value="security">Security Alert</SelectItem>
+                    <SelectItem value="announcement">General Announcement</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               
-              <div>
-                <Label htmlFor="message">Alert Message</Label>
-                <Textarea 
-                  id="message"
-                  placeholder="Enter emergency alert message here..." 
-                  className="min-h-[100px]"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+              <div className="space-y-2">
+                <Label htmlFor="alert-title">Alert Title</Label>
+                <Input 
+                  id="alert-title"
+                  name="title"
+                  placeholder="Enter alert title"
+                  value={alertForm.title}
+                  onChange={handleAlertInputChange}
                 />
               </div>
               
-              <div>
-                <Label htmlFor="expiry">Expiry Time (hours)</Label>
-                <Select value={expiryHours} onValueChange={setExpiryHours}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Set expiry time" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">No Expiry</SelectItem>
-                    <SelectItem value="1">1 Hour</SelectItem>
-                    <SelectItem value="2">2 Hours</SelectItem>
-                    <SelectItem value="4">4 Hours</SelectItem>
-                    <SelectItem value="8">8 Hours</SelectItem>
-                    <SelectItem value="24">24 Hours</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-2">
+                <Label htmlFor="alert-message">Alert Message</Label>
+                <Textarea 
+                  id="alert-message"
+                  name="message"
+                  placeholder="Enter detailed alert message"
+                  value={alertForm.message}
+                  onChange={handleAlertInputChange}
+                  className="min-h-[120px]"
+                />
               </div>
               
-              <div className="flex flex-wrap gap-2 pt-2">
-                <Button onClick={sendAlert} className="gap-2">
-                  <Send className="h-4 w-4" /> Broadcast Alert
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="send-to-all" 
+                    checked={alertForm.sendToAll}
+                    onCheckedChange={handleCheckboxChange}
+                  />
+                  <Label htmlFor="send-to-all">Send to All Campus Areas</Label>
+                </div>
+              </div>
+              
+              {!alertForm.sendToAll && (
+                <div className="space-y-2">
+                  <Label>Affected Areas</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {["Main Campus", "Science Building", "Library", "Dormitories", "Sports Complex", "Parking Lots"].map((area) => (
+                      <div key={area} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`area-${area}`}
+                          checked={alertForm.affectedAreas.includes(area)}
+                          onCheckedChange={() => handleAffectedAreaChange(area)}
+                        />
+                        <Label htmlFor={`area-${area}`}>{area}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex gap-2 justify-end pt-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={previewAlert}
+                  className="gap-2"
+                >
+                  <Eye className="h-4 w-4" />
+                  <span>Preview</span>
                 </Button>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" type="button" onClick={handlePreview}>
-                      <Eye className="h-4 w-4 mr-2" /> Preview
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Alert Preview</DialogTitle>
-                      <DialogDescription>
-                        Preview how your alert will appear to recipients
-                      </DialogDescription>
-                    </DialogHeader>
-                    {previewAlert && (
-                      <div className={`p-4 border rounded-lg ${getAlertClass(previewAlert.type)}`}>
-                        <div className="flex items-center gap-2 mb-2">
-                          {getAlertIcon(previewAlert.type)}
-                          <span className="font-medium capitalize">{previewAlert.type} Alert</span>
+                <Button 
+                  type="submit"
+                  className={`gap-2 ${alertForm.type === "emergency" ? "bg-red-600 hover:bg-red-700" : ""}`}
+                >
+                  <Send className="h-4 w-4" />
+                  <span>Broadcast Alert</span>
+                </Button>
+              </div>
+            </form>
+          </TabsContent>
+          
+          <TabsContent value="history" className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search alerts..." 
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-3 pt-2">
+              {filteredAlerts.length > 0 ? (
+                filteredAlerts.map((alert) => (
+                  <div 
+                    key={alert.id}
+                    className={`border rounded-lg overflow-hidden ${
+                      alert.status === "active" ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20" : ""
+                    }`}
+                  >
+                    <div 
+                      className="flex items-center justify-between p-4 cursor-pointer"
+                      onClick={() => toggleAlertExpand(alert.id)}
+                    >
+                      <div className="flex items-center gap-3">
+                        {getAlertIcon(alert.type)}
+                        <div>
+                          <h3 className="font-medium">{alert.title}</h3>
+                          <p className="text-xs text-muted-foreground">
+                            {alert.timestamp.toLocaleString()}
+                          </p>
                         </div>
-                        <p className="text-sm mb-3">{previewAlert.message}</p>
-                        <div className="text-xs text-muted-foreground flex items-center gap-2">
-                          <Clock className="h-3 w-3" /> 
-                          Just now
-                        </div>
-                        {previewAlert.expiry && (
-                          <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
-                            <Calendar className="h-3 w-3" /> 
-                            Expires in {expiryHours} hour(s)
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getAlertStatusBadge(alert.status)}
+                        {expandedAlerts.includes(alert.id) ? 
+                          <ChevronUp className="h-4 w-4" /> : 
+                          <ChevronDown className="h-4 w-4" />
+                        }
+                      </div>
+                    </div>
+                    
+                    {expandedAlerts.includes(alert.id) && (
+                      <div className="p-4 border-t border-border">
+                        <p className="mb-3">{alert.message}</p>
+                        
+                        {alert.affectedAreas && alert.affectedAreas.length > 0 && (
+                          <div className="flex items-start gap-2 mt-2 text-sm">
+                            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                            <div>
+                              <span className="text-muted-foreground">Affected Areas: </span>
+                              <span>{alert.affectedAreas.join(", ")}</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {alert.location && (
+                          <div className="flex items-start gap-2 mt-2 text-sm">
+                            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                            <div>
+                              <span className="text-muted-foreground">Location: </span>
+                              <span>{alert.location}</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {alert.status === "active" && (
+                          <div className="mt-3 flex justify-end">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="text-green-600 border-green-200 hover:border-green-300 hover:bg-green-50"
+                              onClick={() => {
+                                setAlertHistory(prev => 
+                                  prev.map(a => 
+                                    a.id === alert.id ? { ...a, status: "resolved" } : a
+                                  )
+                                );
+                                toast({
+                                  title: "Alert Resolved",
+                                  description: "The alert has been marked as resolved.",
+                                });
+                              }}
+                            >
+                              Mark as Resolved
+                            </Button>
                           </div>
                         )}
                       </div>
                     )}
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button type="button" variant="secondary">
-                          Close
-                        </Button>
-                      </DialogClose>
-                      <Button type="button" onClick={sendAlert}>
-                        Confirm & Send
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              {/* SOS Options */}
-              <div className="mt-6 pt-4 border-t">
-                <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-red-600" />
-                  Emergency Status Update
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button 
-                    variant="outline" 
-                    className="border-green-400 hover:bg-green-50 text-green-700 h-12 gap-2" 
-                    onClick={() => handleSOSAlert("safe")}
-                  >
-                    <CheckCircle className="h-5 w-5" />
-                    <span>I am Safe</span>
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="border-red-400 hover:bg-red-50 text-red-700 h-12 gap-2" 
-                    onClick={() => handleSOSAlert("need-help")}
-                  >
-                    <AlertTriangle className="h-5 w-5" />
-                    <span>I Need Help</span>
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Update your status during an emergency. This will immediately alert campus security.
-                </p>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="history" className="mt-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-sm font-medium">Alert History</h3>
-              
-              <div className="flex items-center gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-8">
-                      <SlidersHorizontal className="h-3.5 w-3.5 mr-2" />
-                      <span>Filter</span>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-56 p-4" align="end">
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-sm">Filter by Type</h4>
-                      <Select value={filterType} onValueChange={setFilterType}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Filter alerts" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Alerts</SelectItem>
-                          <SelectItem value="critical">Critical</SelectItem>
-                          <SelectItem value="security">Security</SelectItem>
-                          <SelectItem value="warning">Warning</SelectItem>
-                          <SelectItem value="clear">All Clear</SelectItem>
-                          <SelectItem value="sos">SOS Alerts</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-            
-            <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
-              {filteredAlerts.length > 0 ? (
-                filteredAlerts.map((alert) => (
-                  <div 
-                    key={alert.id} 
-                    className={`p-3 border rounded-lg ${getAlertClass(alert.type)} ${isExpired(alert) ? 'opacity-60' : ''} ${alert.sos ? 'border-l-4 border-l-red-500' : ''}`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        {getAlertIcon(alert.type)}
-                        <span className="font-medium capitalize">
-                          {alert.sos ? "SOS " : ""}{alert.type} Alert
-                        </span>
-                        {isExpired(alert) && (
-                          <span className="bg-slate-200 dark:bg-slate-700 text-xs px-2 py-0.5 rounded-full">
-                            Expired
-                          </span>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center gap-1">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-7 w-7" 
-                          onClick={() => deleteAlert(alert.id)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <p className="text-sm mb-2">{alert.message}</p>
-                    
-                    <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" /> 
-                        {alert.timestamp.toLocaleString()}
-                      </span>
-                      
-                      {alert.expiry && (
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" /> 
-                          Expires: {alert.expiry.toLocaleString()}
-                        </span>
-                      )}
-                      
-                      <span>Sent by: {alert.sender}</span>
-                    </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-6 text-muted-foreground">
-                  No alerts match your current filters
+                <div className="text-center py-8 text-muted-foreground">
+                  {searchTerm ? "No alerts match your search" : "No alerts in history"}
                 </div>
               )}
             </div>

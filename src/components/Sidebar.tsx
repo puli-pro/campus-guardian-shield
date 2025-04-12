@@ -16,9 +16,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
+  LogOut
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 type SidebarLink = {
   icon: React.ElementType;
@@ -52,6 +54,13 @@ export default function Sidebar() {
 
   const toggleMobileSidebar = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleLogout = () => {
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out",
+    });
   };
 
   // Close mobile sidebar when navigating to a new page
@@ -113,6 +122,22 @@ export default function Sidebar() {
             </Button>
           </div>
 
+          {/* User Profile Card */}
+          {!collapsed && (
+            <div className="px-4 py-3 border-b border-border">
+              <div className="flex items-center gap-3">
+                <Avatar>
+                  <AvatarImage src="/placeholder.svg" alt="User" />
+                  <AvatarFallback>CG</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                  <span className="font-medium text-sm">Admin User</span>
+                  <span className="text-xs text-muted-foreground">admin@campusguardian.edu</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Sidebar Links */}
           <nav className="flex-1 overflow-y-auto py-4">
             <ul className="space-y-1 px-2">
@@ -143,6 +168,21 @@ export default function Sidebar() {
               })}
             </ul>
           </nav>
+
+          {/* Logout Button */}
+          <div className="p-4 border-t border-border">
+            <Button 
+              variant="outline" 
+              className={cn(
+                "w-full justify-start gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950",
+                collapsed && "justify-center"
+              )}
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              {!collapsed && <span>Logout</span>}
+            </Button>
+          </div>
 
           {/* Sidebar Footer */}
           <div className={cn(
