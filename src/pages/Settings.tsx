@@ -1,42 +1,70 @@
-
 import React, { useState } from "react";
-import Layout from "@/components/Layout";
 import { Helmet } from "react-helmet";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import Layout from "@/components/Layout";
 import { 
-  Settings as SettingsIcon, 
-  Bell, 
-  Moon, 
-  Sun, 
   User, 
   Shield, 
   Lock, 
-  Key,
-  Save,
-  RefreshCw,
-  Database,
-  UserCog,
+  Database, 
+  FileText, 
+  HelpCircle, 
+  Moon, 
+  Sun,
+  Bell,
+  LogOut,
   Upload,
-  Monitor,
-  HardDrive,
   Download,
   Trash2,
-  MessageSquare,
-  Bug,
-  Lightbulb,
-  FileText,
+  Key,
+  Mail,
+  Phone,
+  Image,
+  Globe,
+  Settings as SettingsIcon,
+  Bus as BusIcon,
+  Users as UsersIcon,
+  Calendar as CalendarIcon,
   Camera,
   Languages,
-  Mail
+  Save,
+  RefreshCw,
+  UserCog,
+  Monitor,
+  HardDrive,
+  MessageSquare,
+  Bug,
+  Lightbulb
 } from "lucide-react";
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Settings = () => {
   const { toast } = useToast();
@@ -394,7 +422,7 @@ const Settings = () => {
                     
                     <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                       <div className="flex items-center gap-3">
-                        <Bus className="h-5 w-5 text-green-500" />
+                        <BusIcon className="h-5 w-5 text-green-500" />
                         <div>
                           <p className="font-medium">Bus Tracking</p>
                           <p className="text-sm text-muted-foreground">Connect GPS tracking for campus buses</p>
@@ -443,7 +471,7 @@ const Settings = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Card className="bg-gray-50 dark:bg-gray-800">
                       <CardContent className="p-4 flex flex-col items-center text-center">
-                        <Users className="h-8 w-8 text-blue-500 mb-2" />
+                        <UsersIcon className="h-8 w-8 text-blue-500 mb-2" />
                         <h4 className="font-medium">Visitor Logs</h4>
                         <p className="text-sm text-muted-foreground my-2">Export campus visitor data</p>
                         <Button onClick={() => handleExportData('Visitor')} size="sm" className="mt-2 w-full gap-2">
@@ -455,7 +483,7 @@ const Settings = () => {
                     
                     <Card className="bg-gray-50 dark:bg-gray-800">
                       <CardContent className="p-4 flex flex-col items-center text-center">
-                        <Calendar className="h-8 w-8 text-green-500 mb-2" />
+                        <CalendarIcon className="h-8 w-8 text-green-500 mb-2" />
                         <h4 className="font-medium">Attendance Records</h4>
                         <p className="text-sm text-muted-foreground my-2">Export worker attendance data</p>
                         <Button onClick={() => handleExportData('Attendance')} size="sm" className="mt-2 w-full gap-2">
