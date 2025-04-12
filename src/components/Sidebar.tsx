@@ -29,7 +29,7 @@ type SidebarLink = {
 
 const sidebarLinks: SidebarLink[] = [
   { icon: Home, label: "Home", path: "/home" },
-  { icon: BarChart, label: "Admin Dashboard", path: "/admin-dashboard" },
+  { icon: BarChart, label: "Analytics Dashboard", path: "/analytics-dashboard" },
   { icon: Users, label: "Visitor Management", path: "/visitor-management" },
   { icon: Calendar, label: "Worker Attendance", path: "/worker-attendance" },
   { icon: Bus, label: "Bus Tracker", path: "/bus-tracker" },

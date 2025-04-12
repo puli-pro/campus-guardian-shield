@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,8 @@ import {
   Clock, 
   EyeOff,
   Send,
-  CheckCircle
+  CheckCircle,
+  Navigation
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,18 +29,55 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { format } from "date-fns";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+
+const campusLocations = {
+  theft: ["Library", "Student Center", "Dormitory", "Parking Lot A", "Parking Lot B", "Cafeteria", "Gym"],
+  suspicious: ["Campus Perimeter", "Main Gate", "Library", "Admin Building", "Science Building", "Dormitory Area", "Parking Lot"],
+  harassment: ["Classroom Building", "Student Center", "Library", "Online/Virtual", "Sports Field", "Dormitory", "Cafeteria"],
+  vandalism: ["Bathroom", "Hallway", "Common Room", "Classroom", "Parking Lot", "Dormitory", "Library"],
+  safety: ["Laboratory", "Construction Site", "Stairwell", "Walkway", "Elevator", "Parking Garage", "Pool Area"],
+  lost: ["Library", "Cafeteria", "Classroom", "Gym", "Student Center", "Parking Lot", "Dormitory"],
+  other: ["Main Building", "Admin Office", "Outdoor Space", "Athletic Field", "Conference Room", "Event Hall"]
+};
 
 const SubmitReportForm = () => {
   const { toast } = useToast();
   const [incidentType, setIncidentType] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
-  const [date, setDate] = useState("");
+  const [locationOptions, setLocationOptions] = useState<string[]>([]);
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [time, setTime] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [useCurrentLocation, setUseCurrentLocation] = useState(false);
+  
+  const handleIncidentTypeChange = (value: string) => {
+    setIncidentType(value);
+    setLocationOptions(campusLocations[value as keyof typeof campusLocations] || []);
+  };
+  
+  const handleUseCurrentLocation = () => {
+    setUseCurrentLocation(true);
+    setLocation("Current Location (GPS coordinates will be used)");
+    toast({
+      title: "Location access requested",
+      description: "Your current location will be used for this report."
+    });
+  };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,20 +93,19 @@ const SubmitReportForm = () => {
     
     setIsSubmitting(true);
     
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       setShowSuccess(true);
       
-      // Reset form after a delay
       setTimeout(() => {
         setIncidentType("");
         setDescription("");
         setLocation("");
-        setDate("");
+        setDate(undefined);
         setTime("");
         setIsAnonymous(false);
         setShowSuccess(false);
+        setUseCurrentLocation(false);
       }, 3000);
       
       toast({
@@ -78,6 +114,8 @@ const SubmitReportForm = () => {
       });
     }, 1500);
   };
+  
+  const formattedDate = date ? format(date, 'yyyy-MM-dd') : '';
   
   return (
     <Card>
@@ -104,7 +142,7 @@ const SubmitReportForm = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="incident-type" className="required">Incident Type</Label>
-              <Select value={incidentType} onValueChange={setIncidentType} required>
+              <Select value={incidentType} onValueChange={handleIncidentTypeChange} required>
                 <SelectTrigger>
                   <SelectValue placeholder="Select incident type" />
                 </SelectTrigger>
@@ -135,31 +173,84 @@ const SubmitReportForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="location">Location</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    id="location"
-                    placeholder="Building, room number, or area"
-                    className="pl-9"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                  />
+                <div className="space-y-2">
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    {incidentType && locationOptions.length > 0 ? (
+                      <Select value={location} onValueChange={setLocation}>
+                        <SelectTrigger className="pl-9">
+                          <SelectValue placeholder="Select or specify location" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {locationOptions.map((loc) => (
+                            <SelectItem key={loc} value={loc}>
+                              {loc}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="other">Other (specify below)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input 
+                        id="location"
+                        placeholder="Building, room number, or area"
+                        className="pl-9"
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                      />
+                    )}
+                  </div>
+                  
+                  {location === "other" && (
+                    <Input 
+                      placeholder="Please specify location"
+                      value={useCurrentLocation ? "Current Location" : ""}
+                      onChange={(e) => setLocation(e.target.value)}
+                      className="mt-2"
+                    />
+                  )}
+                  
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-1 flex items-center gap-1"
+                    onClick={handleUseCurrentLocation}
+                  >
+                    <Navigation className="h-3.5 w-3.5" />
+                    <span>Use my current location</span>
+                  </Button>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label htmlFor="date">Date</Label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      id="date"
-                      type="date"
-                      className="pl-9"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                    />
-                  </div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full pl-3 text-left font-normal flex justify-between items-center",
+                          !date && "text-muted-foreground"
+                        )}
+                      >
+                        <div className="flex items-center">
+                          <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                          {date ? format(date, "PP") : "Select date"}
+                        </div>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div>
                   <Label htmlFor="time">Time</Label>

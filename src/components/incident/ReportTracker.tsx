@@ -14,9 +14,12 @@ import {
   FileCheck,
   MessageSquare,
   Search,
-  AlertCircle
+  AlertCircle,
+  Send
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Table,
   TableBody,
@@ -38,6 +41,7 @@ interface IncidentReport {
   isAnonymous: boolean;
   response?: string;
   lastUpdated: Date;
+  comments?: string[];
 }
 
 const getStatusIcon = (status: ReportStatus) => {
@@ -67,8 +71,11 @@ const getStatusBadge = (status: ReportStatus) => {
 };
 
 const ReportTracker = () => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedReport, setSelectedReport] = useState<IncidentReport | null>(null);
+  const [showCommentBox, setShowCommentBox] = useState(false);
+  const [newComment, setNewComment] = useState("");
   
   const [myReports, setMyReports] = useState<IncidentReport[]>([
     {
@@ -80,7 +87,8 @@ const ReportTracker = () => {
       status: "resolved",
       isAnonymous: false,
       response: "Security personnel investigated the area and identified the individual as a photography student working on a project. The student has been advised about campus policies.",
-      lastUpdated: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+      lastUpdated: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+      comments: ["Thank you for the quick response.", "I've seen the same person again today, but they had a faculty member with them."]
     },
     {
       id: "R-1235",
@@ -91,7 +99,8 @@ const ReportTracker = () => {
       status: "closed",
       isAnonymous: false,
       response: "Maintenance team dispatched and removed the hazard. Area has been cleaned and checked for other safety issues.",
-      lastUpdated: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000) // 4 days ago
+      lastUpdated: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
+      comments: []
     },
     {
       id: "R-1236",
@@ -101,7 +110,8 @@ const ReportTracker = () => {
       timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
       status: "reviewing",
       isAnonymous: false,
-      lastUpdated: new Date(Date.now() - 12 * 60 * 60 * 1000) // 12 hours ago
+      lastUpdated: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
+      comments: ["The laptop has a distinctive sticker on it with a blue dragon design."]
     },
     {
       id: "R-1237",
@@ -111,7 +121,8 @@ const ReportTracker = () => {
       timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
       status: "submitted",
       isAnonymous: true,
-      lastUpdated: new Date(Date.now() - 8 * 60 * 60 * 1000) // 8 hours ago
+      lastUpdated: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
+      comments: []
     }
   ]);
   
@@ -123,6 +134,48 @@ const ReportTracker = () => {
   
   const viewReportDetails = (report: IncidentReport) => {
     setSelectedReport(report);
+    setShowCommentBox(false);
+  };
+
+  const addComment = () => {
+    if (!newComment.trim()) {
+      toast({
+        title: "Comment cannot be empty",
+        description: "Please enter a comment before submitting.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (selectedReport) {
+      const updatedReports = myReports.map(report => {
+        if (report.id === selectedReport.id) {
+          const comments = report.comments || [];
+          return {
+            ...report,
+            comments: [...comments, newComment],
+            lastUpdated: new Date()
+          };
+        }
+        return report;
+      });
+
+      setMyReports(updatedReports);
+      
+      // Update the selected report as well
+      const updatedReport = updatedReports.find(r => r.id === selectedReport.id);
+      if (updatedReport) {
+        setSelectedReport(updatedReport);
+      }
+
+      setNewComment("");
+      setShowCommentBox(false);
+
+      toast({
+        title: "Comment added",
+        description: "Your comment has been added to the report."
+      });
+    }
   };
   
   return (
@@ -200,12 +253,71 @@ const ReportTracker = () => {
                 </div>
               )}
               
-              <div className="pt-2">
-                <Button variant="outline" className="w-full gap-2">
-                  <MessageCircle className="h-4 w-4" />
-                  Add Comment
-                </Button>
-              </div>
+              {/* Comments Section */}
+              {selectedReport.comments && selectedReport.comments.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium mb-2">Your Comments</h4>
+                  <div className="space-y-2">
+                    {selectedReport.comments.map((comment, index) => (
+                      <div key={index} className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
+                        <p className="text-sm">{comment}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {index === selectedReport.comments!.length - 1 
+                            ? `Posted on ${selectedReport.lastUpdated.toLocaleDateString()}`
+                            : `Posted earlier`}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Comment Form */}
+              {showCommentBox ? (
+                <div className="pt-2 space-y-2">
+                  <h4 className="text-sm font-medium flex items-center gap-2">
+                    <MessageCircle className="h-4 w-4" />
+                    Add Comment
+                  </h4>
+                  <Textarea
+                    placeholder="Enter your comment here..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className="min-h-[100px]"
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setShowCommentBox(false);
+                        setNewComment("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      size="sm"
+                      onClick={addComment}
+                      className="gap-1"
+                    >
+                      <Send className="h-3.5 w-3.5" />
+                      Submit Comment
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="pt-2">
+                  <Button 
+                    variant="outline" 
+                    className="w-full gap-2"
+                    onClick={() => setShowCommentBox(true)}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Add Comment
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         ) : (

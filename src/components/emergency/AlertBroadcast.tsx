@@ -12,7 +12,8 @@ import {
   CheckCircle, 
   Calendar, 
   X,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Eye
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +32,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 type AlertType = "critical" | "security" | "warning" | "clear";
 
@@ -41,6 +52,7 @@ interface EmergencyAlert {
   timestamp: Date;
   expiry: Date | null;
   sender: string;
+  sos?: boolean;
 }
 
 const getAlertIcon = (type: AlertType) => {
@@ -75,6 +87,8 @@ const AlertBroadcast = () => {
   const [message, setMessage] = useState("");
   const [expiryHours, setExpiryHours] = useState("1");
   const [filterType, setFilterType] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState("compose");
+  const [previewAlert, setPreviewAlert] = useState<EmergencyAlert | null>(null);
   
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([
     {
@@ -108,6 +122,15 @@ const AlertBroadcast = () => {
       timestamp: new Date(Date.now() - 10 * 60000), // 10 minutes ago
       expiry: null,
       sender: "Security Office"
+    },
+    {
+      id: "5",
+      message: "SOS EMERGENCY: Student reported being trapped in elevator in Science Building. Emergency services have been dispatched.",
+      type: "critical",
+      timestamp: new Date(Date.now() - 5 * 60000), // 5 minutes ago
+      expiry: null,
+      sender: "Emergency Response Team",
+      sos: true
     }
   ]);
   
@@ -132,6 +155,7 @@ const AlertBroadcast = () => {
     
     setAlerts([newAlert, ...alerts]);
     setMessage("");
+    setActiveTab("history");
     
     toast({
       title: "Alert sent successfully",
@@ -147,14 +171,64 @@ const AlertBroadcast = () => {
     });
   };
   
+  const handleSOSAlert = (status: "safe" | "need-help") => {
+    const sosMessage = status === "safe" 
+      ? "I am SAFE and not in danger. My current location is secure."
+      : "I NEED HELP. Please send assistance to my current location immediately.";
+      
+    const newAlert: EmergencyAlert = {
+      id: Date.now().toString(),
+      message: sosMessage,
+      type: status === "safe" ? "clear" : "critical",
+      timestamp: new Date(),
+      expiry: null,
+      sender: "Mobile User",
+      sos: true
+    };
+    
+    setAlerts([newAlert, ...alerts]);
+    setActiveTab("history");
+    
+    toast({
+      title: status === "safe" ? "Safe Status Reported" : "Help Request Sent",
+      description: status === "safe" 
+        ? "Your status has been updated to SAFE in the system."
+        : "Emergency services have been notified and assistance is on the way.",
+      variant: status === "safe" ? "default" : "destructive"
+    });
+  };
+  
   const filteredAlerts = alerts.filter(alert => {
     if (filterType === "all") return true;
+    if (filterType === "sos") return alert.sos === true;
     return alert.type === filterType;
   });
   
   const isExpired = (alert: EmergencyAlert) => {
     if (!alert.expiry) return false;
     return new Date() > alert.expiry;
+  };
+
+  const handlePreview = () => {
+    if (!message.trim()) {
+      toast({
+        title: "No message to preview",
+        description: "Please enter an alert message first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const previewData: EmergencyAlert = {
+      id: "preview",
+      message,
+      type: alertType,
+      timestamp: new Date(),
+      expiry: expiryHours ? new Date(Date.now() + parseInt(expiryHours) * 60 * 60000) : null,
+      sender: "Admin User (Preview)"
+    };
+
+    setPreviewAlert(previewData);
   };
   
   return (
@@ -168,7 +242,7 @@ const AlertBroadcast = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="compose">
+        <Tabs defaultValue="compose" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="compose">Compose Alert</TabsTrigger>
             <TabsTrigger value="history">Alert History</TabsTrigger>
@@ -243,9 +317,80 @@ const AlertBroadcast = () => {
                 <Button onClick={sendAlert} className="gap-2">
                   <Send className="h-4 w-4" /> Broadcast Alert
                 </Button>
-                <Button variant="outline" type="button">
-                  Preview
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" type="button" onClick={handlePreview}>
+                      <Eye className="h-4 w-4 mr-2" /> Preview
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Alert Preview</DialogTitle>
+                      <DialogDescription>
+                        Preview how your alert will appear to recipients
+                      </DialogDescription>
+                    </DialogHeader>
+                    {previewAlert && (
+                      <div className={`p-4 border rounded-lg ${getAlertClass(previewAlert.type)}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          {getAlertIcon(previewAlert.type)}
+                          <span className="font-medium capitalize">{previewAlert.type} Alert</span>
+                        </div>
+                        <p className="text-sm mb-3">{previewAlert.message}</p>
+                        <div className="text-xs text-muted-foreground flex items-center gap-2">
+                          <Clock className="h-3 w-3" /> 
+                          Just now
+                        </div>
+                        {previewAlert.expiry && (
+                          <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
+                            <Calendar className="h-3 w-3" /> 
+                            Expires in {expiryHours} hour(s)
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                          Close
+                        </Button>
+                      </DialogClose>
+                      <Button type="button" onClick={sendAlert}>
+                        Confirm & Send
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              {/* SOS Options */}
+              <div className="mt-6 pt-4 border-t">
+                <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                  Emergency Status Update
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button 
+                    variant="outline" 
+                    className="border-green-400 hover:bg-green-50 text-green-700 h-12 gap-2" 
+                    onClick={() => handleSOSAlert("safe")}
+                  >
+                    <CheckCircle className="h-5 w-5" />
+                    <span>I am Safe</span>
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="border-red-400 hover:bg-red-50 text-red-700 h-12 gap-2" 
+                    onClick={() => handleSOSAlert("need-help")}
+                  >
+                    <AlertTriangle className="h-5 w-5" />
+                    <span>I Need Help</span>
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Update your status during an emergency. This will immediately alert campus security.
+                </p>
               </div>
             </div>
           </TabsContent>
@@ -275,6 +420,7 @@ const AlertBroadcast = () => {
                           <SelectItem value="security">Security</SelectItem>
                           <SelectItem value="warning">Warning</SelectItem>
                           <SelectItem value="clear">All Clear</SelectItem>
+                          <SelectItem value="sos">SOS Alerts</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -288,12 +434,14 @@ const AlertBroadcast = () => {
                 filteredAlerts.map((alert) => (
                   <div 
                     key={alert.id} 
-                    className={`p-3 border rounded-lg ${getAlertClass(alert.type)} ${isExpired(alert) ? 'opacity-60' : ''}`}
+                    className={`p-3 border rounded-lg ${getAlertClass(alert.type)} ${isExpired(alert) ? 'opacity-60' : ''} ${alert.sos ? 'border-l-4 border-l-red-500' : ''}`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         {getAlertIcon(alert.type)}
-                        <span className="font-medium capitalize">{alert.type} Alert</span>
+                        <span className="font-medium capitalize">
+                          {alert.sos ? "SOS " : ""}{alert.type} Alert
+                        </span>
                         {isExpired(alert) && (
                           <span className="bg-slate-200 dark:bg-slate-700 text-xs px-2 py-0.5 rounded-full">
                             Expired
