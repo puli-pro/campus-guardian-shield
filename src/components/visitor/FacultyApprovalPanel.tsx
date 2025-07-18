@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, XCircle, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import axios from "axios";
+import { API_BASE_URL } from "../Constants";
 
 interface Faculty {
   id: number;
@@ -21,7 +23,7 @@ interface VisitorData {
 }
 
 interface FacultyApprovalPanelProps {
-  visitor: VisitorData;
+  visitor: any;
   faculty?: Faculty;
   onResponse: (response: "approved" | "denied") => void;
 }
@@ -35,32 +37,74 @@ export default function FacultyApprovalPanel({
   const [simulationState, setSimulationState] = useState<"waiting" | "receiving" | "received">("waiting");
   
   // Simulate the faculty reviewing the notification
-  const simulateFacultyReview = () => {
+  const simulateFacultyReview = async () => {
     setSimulationState("receiving");
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/notifications/create/`, {
+          "management_id": visitor?.whom_to_meet,
+          "visitor_id": visitor?.id,
+          "title": "This man came to visit you",
+          "message": "Please accept"
+      }, {
+      });
+      
+      const savedAlert = response.data;
+      setSimulationState("received");
+
+    } catch (err) {
+      console.log(err)
+    }
     
     // Simulate network delay
     setTimeout(() => {
-      setSimulationState("received");
     }, 2000);
   };
   
   // Handle approval click
-  const handleApprove = () => {
+  const handleApprove = async () => {
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const response = await axios.patch(`${API_BASE_URL}/visitors/${visitor?.id}/update_status/`, {
+        "status": "APPROVED",
+        "denial_reason": ""
+      }, {
+      });
+
+      const savedAlert = response.data;
       onResponse("approved");
+
+    } catch (err) {
+      console.log(err)
+    }
+    setTimeout(() => {
       setLoading(false);
     }, 1000);
   };
+
   
   // Handle denial click
-  const handleDeny = () => {
+  const handleDeny = async() => {
     setLoading(true);
+    try {
+      const response = await axios.patch(`${API_BASE_URL}/visitors/${visitor?.id}/update_status/`, {
+        "status": "DENIED",
+        "denial_reason": "No available appointment slot"
+      }, {
+      });
+
+      const savedAlert = response.data;
+      onResponse("approved");
+
+    } catch (err) {
+      console.log(err)
+    }
     setTimeout(() => {
       onResponse("denied");
       setLoading(false);
     }, 1000);
   };
+
   
   return (
     <div className="flex flex-col items-center p-4 gap-6">
