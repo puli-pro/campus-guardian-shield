@@ -144,7 +144,7 @@ const Home = () => {
                   <div className="space-y-4">
                     <p className="italic">"The Campus Guardian Shield has completely transformed how we approach security. The visitor management system has made check-ins seamless and secure."</p>
                     <div>
-                      <p className="font-medium">Dr. Sarah Johnson</p>
+                      <p className="font-medium">Dr. Madhusudhana Rao</p>
                       <p className="text-sm text-muted-foreground">Campus Security Director</p>
                     </div>
                   </div>
@@ -156,7 +156,7 @@ const Home = () => {
                   <div className="space-y-4">
                     <p className="italic">"I feel much safer knowing that the campus has implemented this system. The emergency alerts have been particularly helpful during weather emergencies."</p>
                     <div>
-                      <p className="font-medium">Michael Rodriguez</p>
+                      <p className="font-medium">Rama Krishna</p>
                       <p className="text-sm text-muted-foreground">Student, Computer Science</p>
                     </div>
                   </div>
@@ -168,8 +168,8 @@ const Home = () => {
                   <div className="space-y-4">
                     <p className="italic">"The incident reporting system makes it easy to report concerns and track their resolution. It's greatly improved communication between students and administration."</p>
                     <div>
-                      <p className="font-medium">Professor Emma Chen</p>
-                      <p className="text-sm text-muted-foreground">Faculty, Engineering Department</p>
+                      <p className="font-medium">Dr Sudhakar Jyothula</p>
+                      <p className="text-sm text-muted-foreground">Principal</p>
                     </div>
                   </div>
                 </CardContent>
@@ -226,7 +226,7 @@ const Home = () => {
               <div className="space-y-4">
                 <h2 className="text-3xl font-bold tracking-tight">About Our College</h2>
                 <p className="text-muted-foreground">
-                  Founded in 1965, our institution has been at the forefront of education and innovation for over five decades. With a commitment to excellence, we provide a safe and enriching environment for our diverse student body and faculty.
+                  Vignan's Institute of Information Technology (VIIT) was established in 2002 in the City of Destiny, Visakhapatnam, to cater to the educational needs of the general public. It acquired Autonomous status in the year 2017 and NBA and NAAC(A+ Grade) accredited Institute. The experience gained by Vignan through its earlier institutions at Guntur has only helped in establishing very high quality standards right from the inception and also is one of the reasons for the success.
                 </p>
                 <p className="text-muted-foreground">
                   Campus Guardian Shield is just one example of our dedication to using technology to enhance the campus experience and ensure the wellbeing of our community.
@@ -239,19 +239,20 @@ const Home = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Phone className="h-5 w-5 text-primary" />
-                    <p>Emergency: (555) 123-4567</p>
+                    <p>Emergency: 0891 - 27 55 222/333</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Phone className="h-5 w-5 text-muted-foreground" />
-                    <p>Main Office: (555) 987-6543</p>
+                    <p>Main Office: 0891 - 27 55 444/555</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail className="h-5 w-5 text-muted-foreground" />
-                    <p>info@campusguardian.edu</p>
+                    <p>vignaniit@yahoo.com / principal@vignaniit.edu.in</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5 text-muted-foreground" />
-                    <p>123 University Avenue, College Town, CT 12345</p>
+                    <p>Besides VSEZ , Duvvada,Vadlapudi Post , Gajuwaka
+Visakhaptnam -530049 , A.P., India</p>
                   </div>
                 </div>
                 <Button className="mt-4">Contact Us</Button>
